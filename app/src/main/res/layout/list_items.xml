@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_container">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:orientation="vertical">
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:foregroundGravity="center"
+                android:gravity="center">
+                                <TableRow
+                                    android:layout_width="308dp"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center">
+
+                                    <ImageView
+                                        android:id="@+id/dp_clean_1"
+                                        android:layout_width="177dp"
+                                        android:layout_height="187dp"
+                                        android:layout_marginBottom="-20dp"
+                                        android:clickable="true"
+                                        android:focusable="true"
+                                        app:srcCompat="@drawable/person" />
+
+                                </TableRow>
+
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/name_of_provider"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:text="NAME OF CLEANER"
+                                        android:textColor="#FF69B4"
+                                        android:textStyle="bold"
+                                        android:clickable="true"
+                                        android:focusable="true" />
+                                </TableRow>
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/location"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:text="LOCATION"
+                                        android:textColor="#339933"
+                                        android:textStyle="bold"
+                                        android:clickable="true"
+                                        android:focusable="true" />
+
+                                </TableRow>
+            </TableLayout>
+        </ScrollView>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

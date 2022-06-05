@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "831046158884",
+    "firebase_url": "https://hanapp-f4365-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "hanapp-f4365",
+    "storage_bucket": "hanapp-f4365.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:831046158884:android:f199ae1356e74941e3e6b1",
+        "android_client_info": {
+          "package_name": "com.example.freelancerapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "831046158884-1tlhv3rpid3v2dpb6e3r9jt5gtgb26ft.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCppHZUSdgcEWvyHb24jt1zSk7wEBclrfE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "831046158884-1tlhv3rpid3v2dpb6e3r9jt5gtgb26ft.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

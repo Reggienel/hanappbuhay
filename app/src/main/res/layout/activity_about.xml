@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/drawer_layout"
+    tools:context=".About">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include layout="@layout/main_toolbar" />
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="About"
+            android:textColor="#FF69B4"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="185dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView10"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lacus vestibulum sed arcu non odio euismod lacinia at quis. Sed velit dignissim sodales ut eu sem integer vitae justo. Sed id semper risus in hendrerit gravida rutrum quisque. Habitant morbi tristique senectus et netus et malesuada fames. Enim nunc faucibus a pellentesque sit. Viverra adipiscing at in tellus integer. Fermentum leo vel orci porta non. Ipsum a arcu cursus vitae congue mauris. Malesuada fames ac turpis egestas. Cursus risus at ultrices mi tempus imperdiet nulla malesuada.
+Aliquam sem fringilla ut morbi tincidunt. Odio facilisis mauris sit amet. Eros in cursus turpis massa tincidunt dui. In ante metus dictum at tempor commodo. Arcu odio ut sem nulla pharetra diam sit amet nisl. Et magnis dis parturient montes. Phasellus vestibulum lorem sed risus ultricies tristique nulla. Volutpat ac tincidunt vitae semper quis lectus. Sed lectus vestibulum mattis ullamcorper velit sed ullamcorper morbi. A lacus vestibulum sed arcu non odio euismod. Quis enim lobortis scelerisque fermentum dui faucibus. Tellus elementum sagittis vitae et. Tellus id interdum velit laoreet id donec ultrices tincidunt. Auctor urna nunc id cursus metus aliquam eleifend. Nam aliquam sem et tortor consequat id porta nibh venenatis. Volutpat est velit egestas dui id ornare." />
+
+            </LinearLayout>
+        </ScrollView>
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Terms and Conditions"
+            android:textColor="#FF69B4"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="455dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="20dp">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mauris sit amet massa vitae tortor. Euismod nisi porta lorem mollis aliquam ut. Eget gravida cum sociis natoque penatibus. Sagittis eu volutpat odio facilisis mauris sit amet massa. Nisi lacus sed viverra tellus in hac. Lobortis elementum nibh tellus molestie nunc non blandit massa. Pellentesque eu tincidunt tortor aliquam. Volutpat blandit aliquam etiam erat velit. Vivamus arcu felis bibendum ut tristique et egestas quis. Faucibus pulvinar elementum integer enim neque volutpat ac tincidunt vitae. Eleifend donec pretium vulputate sapien nec. Pellentesque habitant morbi tristique senectus et netus. Ultrices dui sapien eget mi proin sed libero enim sed. Velit ut tortor pretium viverra suspendisse potenti nullam ac tortor. Amet mattis vulputate enim nulla aliquet. Lorem sed risus ultricies tristique nulla aliquet enim. Bibendum est ultricies integer quis auctor elit sed vulputate mi. Turpis massa tincidunt dui ut ornare lectus sit amet est.
+
+Tortor posuere ac ut consequat semper viverra nam. Eget duis at tellus at. Pretium lectus quam id leo in. Id porta nibh venenatis cras sed. Justo nec ultrices dui sapien eget mi proin sed. Nunc consequat interdum varius sit amet mattis. Bibendum ut tristique et egestas quis ipsum. Nisl condimentum id venenatis a condimentum vitae sapien pellentesque. Amet purus gravida quis blandit turpis cursus in. Lectus urna duis convallis convallis tellus id interdum. Eget mi proin sed libero enim sed faucibus turpis. Varius sit amet mattis vulputate enim nulla. Pulvinar neque laoreet suspendisse interdum consectetur. Varius morbi enim nunc faucibus. Posuere morbi leo urna molestie at elementum eu. Consequat mauris nunc congue nisi vitae suscipit tellus.
+
+At lectus urna duis convallis convallis tellus id interdum. Elit sed vulputate mi sit amet mauris commodo. Netus et malesuada fames ac turpis. Amet purus gravida quis blandit turpis cursus in hac. Mi sit amet mauris commodo quis imperdiet massa tincidunt. Enim facilisis gravida neque convallis a cras. Massa sed elementum tempus egestas sed sed. Turpis nunc eget lorem dolor sed viverra ipsum nunc. Lectus sit amet est placerat in. Commodo elit at imperdiet dui accumsan sit amet. Et molestie ac feugiat sed lectus. Maecenas pharetra convallis posuere morbi. Quis commodo odio aenean sed. Ut eu sem integer vitae justo eget magna. Egestas egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Sit amet purus gravida quis blandit turpis cursus.
+
+Dolor sit amet consectetur adipiscing elit. Magna etiam tempor orci eu lobortis elementum nibh tellus. Vel quam elementum pulvinar etiam. Risus ultricies tristique nulla aliquet enim tortor. Risus in hendrerit gravida rutrum quisque non tellus orci ac. Purus in massa tempor nec feugiat nisl. Laoreet id donec ultrices tincidunt arcu non sodales neque. Sagittis eu volutpat odio facilisis mauris sit amet massa. Mi sit amet mauris commodo quis imperdiet massa tincidunt nunc. Tincidunt augue interdum velit euismod in pellentesque massa.
+
+Et tortor at risus viverra adipiscing. Consequat id porta nibh venenatis cras sed. Ut ornare lectus sit amet est. Lorem ipsum dolor sit amet consectetur. Dui sapien eget mi proin sed libero enim sed. In ante metus dictum at tempor commodo. Vitae auctor eu augue ut. Eu feugiat pretium nibh ipsum consequat nisl vel pretium. Volutpat est velit egestas dui id. Eget nunc lobortis mattis aliquam faucibus purus in massa tempor. Suspendisse ultrices gravida dictum fusce ut placerat orci nulla. Malesuada bibendum arcu vitae elementum curabitur vitae. Lacus sed viverra tellus in hac. Mi tempus imperdiet nulla malesuada pellentesque." />
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+    <RelativeLayout
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@android:color/white">
+        <include layout="@layout/main_nav_drawer"/>
+    </RelativeLayout>
+
+</androidx.drawerlayout.widget.DrawerLayout>
