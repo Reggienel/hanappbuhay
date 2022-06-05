@@ -67,19 +67,14 @@ public class activity_appointment extends AppCompatActivity {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
                 newString= null;
-                Toast.makeText(getApplicationContext(),newString +"null if",
-                        Toast.LENGTH_SHORT).show();
             } else {
                 newString= extras.getString("username");
                 tvname_of_provider.setText(newString);
-                Toast.makeText(getApplicationContext(),newString + "extra else",
-                        Toast.LENGTH_SHORT).show();
+
             }
         } else {
             newString = (String) savedInstanceState.getSerializable("username");
             tvname_of_provider.setText(newString);
-            Toast.makeText(getApplicationContext(),"savedinstance else",
-                    Toast.LENGTH_SHORT).show();
         }
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
