@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,7 +37,7 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ArrayList<User> userArrayList;
     private RecyclerView recyclerView;
-    String userID, serType, userName;;
+    String userID, serType, userid, username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +98,8 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
                     try {
                         if (serType.matches("Plumbing")) {
                             userArrayList.add(user);
-                            userName = ds.getValue(User.class).getUsername();
+                            username = ds.getValue(User.class).getUsername();
+                            userid = ds.getValue(User.class).getUserid();
                         }
                     }
                     catch (NullPointerException ignored){
@@ -171,7 +171,8 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
     @Override
     public void onItemClicked(User user) {
         Intent intentP = new Intent(this, activity_appointment.class);
-        intentP.putExtra("username",userName);
+        intentP.putExtra("userid",userid);
+        intentP.putExtra("username",username);
         finish();
         startActivity(intentP);
     }

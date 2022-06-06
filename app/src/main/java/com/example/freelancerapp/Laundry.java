@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,7 +37,7 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ArrayList<User> userArrayList;
     private RecyclerView recyclerView;
-    String userID, serType, userName;;
+    String userID, serType, userid, username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +96,8 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
                         try {
                             if (serType.matches("Laundry")) {
                                 userArrayList.add(user);
-                                userName = ds.getValue(User.class).getUsername();
+                                username = ds.getValue(User.class).getUsername();
+                                userid = ds.getValue(User.class).getUserid();
                             }
                         }
                         catch (NullPointerException ignored){
@@ -169,7 +169,8 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
     @Override
     public void onItemClicked(User user) {
         Intent intentL = new Intent(this, activity_appointment.class);
-        intentL.putExtra("username",userName);
+        intentL.putExtra("userid",userid);
+        intentL.putExtra("username",username);
         finish();
         startActivity(intentL);
     }

@@ -7,11 +7,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -38,7 +42,8 @@ public class activity_appointment extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    String userID, selectedDate, selectedTime;
+    FirebaseUser fUser;
+    String userID, selectedDate, selectedTime, newUserName, newUserID, username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,22 +64,24 @@ public class activity_appointment extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabase = mFirebaseDatabase.getReference();
-        FirebaseUser fUser = mAuth.getCurrentUser();
+        fUser = mAuth.getCurrentUser();
         userID = fUser.getUid();
 
-        String newString;
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
-                newString= null;
+                newUserName= null;
+                newUserID= null;
             } else {
-                newString= extras.getString("username");
-                tvname_of_provider.setText(newString);
+                newUserName= extras.getString("username");
+                newUserID= extras.getString("userid");
+                tvname_of_provider.setText(newUserName);
 
             }
         } else {
-            newString = (String) savedInstanceState.getSerializable("username");
-            tvname_of_provider.setText(newString);
+            newUserName = (String) savedInstanceState.getSerializable("username");
+            newUserID = (String) savedInstanceState.getSerializable("userid");
+            tvname_of_provider.setText(newUserName);
         }
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -92,21 +99,50 @@ public class activity_appointment extends AppCompatActivity {
             }
         };
 
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                showData(snapshot);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         appointbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mDatabase.child("users").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (selectedDate != null || selectedTime != null){
-                            dataSnapshot.getRef().child("appointment").child(newString).child("date").setValue(selectedDate);
-                            dataSnapshot.getRef().child("appointment").child(newString).child("time").setValue(selectedTime);
-                            Toast.makeText(getApplicationContext(),"Appointment Save",
-                                    Toast.LENGTH_SHORT).show();}
-                        else{
-                            Toast.makeText(getApplicationContext(),"Please Set Time and Date",
-                                    Toast.LENGTH_SHORT).show();
-                        }
+                        AlertDialog.Builder ad1 = new AlertDialog.Builder(activity_appointment.this);
+                        ad1.setTitle("Confirmation:");
+                        ad1.setIcon(android.R.drawable.ic_dialog_info);
+                        ad1.setMessage("Are you sure you want to set an appointment with " + newUserName + " on " + selectedDate + " at " + selectedTime +" ?");
+                        ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                if (selectedDate != null || selectedTime != null){
+                                    dataSnapshot.getRef().child("appointment").child(newUserName).child(newUserID).child("date").setValue(selectedDate);
+                                    dataSnapshot.getRef().child("appointment").child(newUserName).child(newUserID).child("time").setValue(selectedTime);
+                                    notifyEmployee();
+                                    Toast.makeText(getApplicationContext(),"Appointment Save",
+                                            Toast.LENGTH_SHORT).show();}
+                                else{
+                                    Toast.makeText(getApplicationContext(),"Please Set Time and Date",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                        ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+
+                            }
+                        });
+                        ad1.show();// Show dialog
+
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
@@ -115,6 +151,51 @@ public class activity_appointment extends AppCompatActivity {
                         Log.d("User", databaseError.getMessage());
                     }
                 });
+            }
+        });
+    }
+
+    private void showData(DataSnapshot snapshot) {
+        for (DataSnapshot ds : snapshot.getChildren()){
+            User user = new User();
+            user.setUsername(ds.child(userID).getValue(User.class).getUsername());
+            user.setEmail(ds.child(userID).getValue(User.class).getEmail());
+            user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
+            user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
+            user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
+
+            username = user.getUsername();
+            Log.d("User",username);
+//            StorageReference filepath = storageReference.child("profile_picture_"+userID);
+//            filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                @Override
+//                public void onSuccess(Uri uri) {
+//                    Picasso.get().load(uri).into(imgProfilePic);
+//                }
+//            }).addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception exception) {
+//                    Log.d("View Profile", "No Upload Profile");
+//                }
+//            });
+        }
+    }
+
+    private void notifyEmployee() {
+        mDatabase.child("users").child(newUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataSnapshot.getRef().child("employee_appointment").child(username).child(userID).child("date").setValue(selectedDate);
+                dataSnapshot.getRef().child("employee_appointment").child(username).child(userID).child("time").setValue(selectedTime);
+                Toast.makeText(getApplicationContext(),  "Employee Notified",
+                        Toast.LENGTH_SHORT).show();
+            }
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(),"Employee Not Notified",
+                        Toast.LENGTH_SHORT).show();
+                Log.d("User", databaseError.getMessage());
+
+
             }
         });
     }

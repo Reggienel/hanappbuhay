@@ -1,23 +1,33 @@
 package com.example.freelancerapp;
 
 public class User {
-
+    public String userid;
     public String username;
     public String email;
     public String password;
     public String phonenum;
     public String service_type;
     public String availability;
+    public String getUsername;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String username, String email, String phonenum, String password) {
+    public User(String userid, String username, String email, String phonenum, String password) {
+        this.userid = userid;
         this.username = username;
         this.email = email;
         this.phonenum = phonenum;
         this.password = password;
+    }
+
+    public String getUserid() {
+        return userid;
+    }
+
+    public void setUserid(String userid) {
+        this.userid= userid;
     }
 
     public String getUsername() {

@@ -113,7 +113,7 @@ public class Register extends AppCompatActivity {
     }
 
     public void writeNewUser(String userId, String name, String email, String phonenum, String password) {
-        User user = new User(name, email, phonenum, password);
+        User user = new User(userId,name, email, phonenum, password);
 
         mDatabase.child("users").child(userId).setValue(user);
         String TAG = "write";
