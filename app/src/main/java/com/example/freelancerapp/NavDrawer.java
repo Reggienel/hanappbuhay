@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,13 +11,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -138,9 +135,9 @@ public class NavDrawer extends AppCompatActivity {
         //Recreate activity to profile
         redirectActivity(this,Profile.class);
     }
-    public void ClickSettings(View view){
+    public void ClickDashboard(View view){
         //Recreate activity to settings
-        redirectActivity(this,Settings.class);
+        redirectActivity(this, Dashboard.class);
     }
     public void ClickAbout(View view){
         //Recreate activity to settings

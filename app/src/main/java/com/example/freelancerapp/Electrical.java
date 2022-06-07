@@ -132,9 +132,9 @@ public class Electrical extends AppCompatActivity implements OnNoteListener{
         //recreate activity
         NavDrawer.redirectActivity(this, Profile.class);
     }
-    public void ClickSettings(View view){
-        //redirect activity to settings
-        NavDrawer.redirectActivity(this, Settings.class);
+    public void ClickDashboard(View view){
+        //Recreate activity to settings
+        NavDrawer.redirectActivity(this, Dashboard.class);
     }
     public void ClickAbout(View view){
         //redirect activity to settings
@@ -170,6 +170,7 @@ public class Electrical extends AppCompatActivity implements OnNoteListener{
         Intent intentE = new Intent(this, activity_appointment.class);
         intentE.putExtra("userid",userid);
         intentE.putExtra("username",username);
+        intentE.putExtra("service","Electrical");
         finish();
         startActivity(intentE);
     }

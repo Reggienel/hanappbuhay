@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_container">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:orientation="vertical">
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <ImageView
+                        android:id="@+id/imageView"
+                        android:layout_width="177dp"
+                        android:layout_height="203dp"
+                        android:gravity="center"
+                        app:srcCompat="@drawable/person" />
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                    <TextView
+                        android:id="@+id/name_of_provider_dboard"
+                        android:layout_width="235dp"
+                        android:layout_height="wrap_content"
+                        android:background="#339933"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="NAME OF CLEANER"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <TextView
+                        android:id="@+id/service_dboard"
+                        android:layout_width="235dp"
+                        android:layout_height="wrap_content"
+                        android:background="#98FB98"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="Cleaning"
+                        android:textColor="#339933"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <TextView
+                        android:id="@+id/date_dboard"
+                        android:layout_width="235dp"
+                        android:layout_height="wrap_content"
+                        android:background="#FFC0CB"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="June 6, 2006"
+                        android:textColor="#339933"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <TextView
+                        android:id="@+id/time_dboard"
+                        android:layout_width="235dp"
+                        android:layout_height="wrap_content"
+                        android:background="#90EE90"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="6:00pm"
+                        android:textColor="#339933"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <TextView
+                        android:id="@+id/meet_place_dboard"
+                        android:layout_width="235dp"
+                        android:layout_height="wrap_content"
+                        android:background="#FFC0CB"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="Near 7/11"
+                        android:textColor="#339933"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:gravity="center">
+                        <Button
+                            android:id="@+id/button4"
+                            android:layout_width="130dp"
+                            android:layout_height="wrap_content"
+                            android:background="#98FB98"
+                            android:text="Cancel"/>
+
+
+
+                        <Button
+                            android:id="@+id/button5"
+                            android:layout_width="130dp"
+                            android:layout_height="wrap_content"
+                            android:background="#98FB98"
+                            android:layout_marginHorizontal="10dp"
+                            android:text="Message"
+                            />
+
+
+                        <Button
+                            android:id="@+id/button3"
+                            android:layout_width="130dp"
+                            android:layout_height="wrap_content"
+                            android:background="#FFC0CB"
+                            android:text="Mark as done"
+                            />
+                    </TableRow>
+                </TableLayout>
+        </ScrollView>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

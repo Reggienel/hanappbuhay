@@ -675,9 +675,9 @@ public class Profile extends AppCompatActivity {
         //recreate activity
         recreate();
     }
-    public void ClickSettings(View view){
-        //redirect activity to settings
-        NavDrawer.redirectActivity(this, Settings.class);
+    public void ClickDashboard(View view){
+        //Recreate activity to settings
+        NavDrawer.redirectActivity(this, Dashboard.class);
     }
     public void ClickAbout(View view){
         //redirect activity to settings

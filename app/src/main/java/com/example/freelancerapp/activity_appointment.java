@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +44,8 @@ public class activity_appointment extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
     FirebaseUser fUser;
-    String userID, selectedDate, selectedTime, newUserName, newUserID, username;
+    public String newUserName;
+    String userID, selectedDate, selectedTime, newUserID, username, newService;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,15 +74,18 @@ public class activity_appointment extends AppCompatActivity {
             if(extras == null) {
                 newUserName= null;
                 newUserID= null;
+                newService= null;
             } else {
                 newUserName= extras.getString("username");
                 newUserID= extras.getString("userid");
+                newService= extras.getString("service");
                 tvname_of_provider.setText(newUserName);
 
             }
         } else {
             newUserName = (String) savedInstanceState.getSerializable("username");
             newUserID = (String) savedInstanceState.getSerializable("userid");
+            newService = (String) savedInstanceState.getSerializable("service");
             tvname_of_provider.setText(newUserName);
         }
 
@@ -115,7 +120,7 @@ public class activity_appointment extends AppCompatActivity {
         appointbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mDatabase.child("users").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+                mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         AlertDialog.Builder ad1 = new AlertDialog.Builder(activity_appointment.this);
@@ -125,11 +130,17 @@ public class activity_appointment extends AppCompatActivity {
                         ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int i) {
                                 if (selectedDate != null || selectedTime != null){
-                                    dataSnapshot.getRef().child("appointment").child(newUserName).child(newUserID).child("date").setValue(selectedDate);
-                                    dataSnapshot.getRef().child("appointment").child(newUserName).child(newUserID).child("time").setValue(selectedTime);
+                                    dataSnapshot.getRef().child(newUserID).child("id").setValue(newUserID);
+                                    dataSnapshot.getRef().child(newUserID).child("name").setValue("Employee: "+newUserName);
+                                    dataSnapshot.getRef().child(newUserID).child("service").setValue(newService);
+                                    dataSnapshot.getRef().child(newUserID).child("date").setValue(selectedDate);
+                                    dataSnapshot.getRef().child(newUserID).child("time").setValue(selectedTime);
+
                                     notifyEmployee();
                                     Toast.makeText(getApplicationContext(),"Appointment Save",
-                                            Toast.LENGTH_SHORT).show();}
+                                            Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(activity_appointment.this, Dashboard.class);
+                                    startActivity(intent);}
                                 else{
                                     Toast.makeText(getApplicationContext(),"Please Set Time and Date",
                                             Toast.LENGTH_SHORT).show();
@@ -165,7 +176,6 @@ public class activity_appointment extends AppCompatActivity {
             user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
 
             username = user.getUsername();
-            Log.d("User",username);
 //            StorageReference filepath = storageReference.child("profile_picture_"+userID);
 //            filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
 //                @Override
@@ -182,11 +192,17 @@ public class activity_appointment extends AppCompatActivity {
     }
 
     private void notifyEmployee() {
-        mDatabase.child("users").child(newUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child("bookings").child(newUserID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                dataSnapshot.getRef().child("employee_appointment").child(username).child(userID).child("date").setValue(selectedDate);
-                dataSnapshot.getRef().child("employee_appointment").child(username).child(userID).child("time").setValue(selectedTime);
+                dataSnapshot.getRef().child(userID).child("id").setValue(userID);
+                dataSnapshot.getRef().child(userID).child("name").setValue("Employer: "+username);
+                dataSnapshot.getRef().child(userID).child("service").setValue(newService);
+                dataSnapshot.getRef().child(userID).child("date").setValue(selectedDate);
+                dataSnapshot.getRef().child(userID).child("time").setValue(selectedTime);
+                Log.d("User",username);
+//                dataSnapshot.getRef().child("employee_appointment").child(username).child(userID).child("date").setValue(selectedDate);
+//                dataSnapshot.getRef().child("employee_appointment").child(username).child(userID).child("time").setValue(selectedTime);
                 Toast.makeText(getApplicationContext(),  "Employee Notified",
                         Toast.LENGTH_SHORT).show();
             }
@@ -194,8 +210,6 @@ public class activity_appointment extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"Employee Not Notified",
                         Toast.LENGTH_SHORT).show();
                 Log.d("User", databaseError.getMessage());
-
-
             }
         });
     }

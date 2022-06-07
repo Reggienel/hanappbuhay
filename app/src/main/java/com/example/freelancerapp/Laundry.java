@@ -133,9 +133,9 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
         //recreate activity
         NavDrawer.redirectActivity(this, Profile.class);
     }
-    public void ClickSettings(View view){
-        //redirect activity to settings
-        NavDrawer.redirectActivity(this, Settings.class);
+    public void ClickDashboard(View view){
+        //Recreate activity to settings
+        NavDrawer.redirectActivity(this, Dashboard.class);
     }
     public void ClickAbout(View view){
         //redirect activity to settings
@@ -171,6 +171,7 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
         Intent intentL = new Intent(this, activity_appointment.class);
         intentL.putExtra("userid",userid);
         intentL.putExtra("username",username);
+        intentL.putExtra("service","Laundry");
         finish();
         startActivity(intentL);
     }

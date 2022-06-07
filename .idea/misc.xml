@@ -5,7 +5,8 @@
       <map>
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/drawable/add_background.xml" value="0.2345" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/drawable/clean_background.xml" value="0.2345" />
-        <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/activity_about.xml" value="0.19166666666666668" />
+        <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/drawable/icon_settings.xml" value="0.1795" />
+        <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/activity_about.xml" value="0.1" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/activity_appointment.xml" value="0.33" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/activity_cleaning.xml" value="0.25" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/activity_electrical.xml" value="0.19166666666666668" />
@@ -17,6 +18,7 @@
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/activity_profile.xml" value="0.33" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/activity_register.xml" value="0.358695652173913" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/activity_settings.xml" value="0.19166666666666668" />
+        <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/dashboard.xml" value="0.1" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/dialog_availability.xml" value="0.25905797101449274" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/dialog_new_email.xml" value="0.371875" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/dialog_new_name.xml" value="0.2563405797101449" />
@@ -24,6 +26,7 @@
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/dialog_service_type.xml" value="0.371875" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/dialog_wait.xml" value="0.5" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/list_items.xml" value="0.25" />
+        <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/list_items2.xml" value="0.22644927536231885" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/main_nav_drawer.xml" value="0.19166666666666668" />
         <entry key="..\:/Temp Files/a.Download(E)/Programs/FreelancerApp/app/src/main/res/layout/main_toolbar.xml" value="0.19166666666666668" />
       </map>

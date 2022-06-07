@@ -1,20 +1,18 @@
 package com.example.freelancerapp;
 
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,17 +25,17 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 
-public class Plumbing extends AppCompatActivity implements OnNoteListener{
+public class Dashboard extends AppCompatActivity implements OnNoteListenerdashboard{
     TextView textView;
     //initialize variable
     DrawerLayout drawerLayout;
-    public DatabaseReference mDatabase;
+    public DatabaseReference mDatabase, appoint;
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private ArrayList<User> userArrayList;
+    private ArrayList<UserAppointment> userArrayList2;
     private RecyclerView recyclerView;
-    String userID, serType, userid, username;
+    String userID, aId, aName, aService, aTime, aDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,21 +43,15 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //getSupportActionBar().hide();
-        setContentView(R.layout.activity_plumbing);
+        setContentView(R.layout.dashboard);
         // globally
         TextView myAwesomeTextView = (TextView)findViewById(R.id.NavTitle);
 
 //in your OnCreate() method
-        myAwesomeTextView.setText("PLUMBING");
+        myAwesomeTextView.setText("Dashboard");
 
         //assign variable
         drawerLayout = findViewById(R.id.drawer_layout);
-        mAuth = FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mDatabase = mFirebaseDatabase.getReference("users");
-        FirebaseUser fUser = mAuth.getCurrentUser();
-        userID = fUser.getUid();
-
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -75,48 +67,57 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
             }
         };
 
-        recyclerView = findViewById(R.id.recycleview);
-        userArrayList = new ArrayList<>();
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        FirebaseUser fUser = mAuth.getCurrentUser();
+        userID = fUser.getUid();
+        mDatabase = mFirebaseDatabase.getReference();
+
+        recyclerView = findViewById(R.id.recycleviewdb);
+        userArrayList2 = new ArrayList<UserAppointment>();
         setAdapter();
     }
 
     private void setAdapter() {
-        recyclerAdapter adapter = new recyclerAdapter(userArrayList, this);
+        recyclerAdapterDashboard adapter = new recyclerAdapterDashboard(userArrayList2, this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
+       mDatabase.child("bookings").child(userID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    User user = ds.getValue(User.class);
-                    serType = ds.getValue(User.class).getServicetype();
-
-
                     try {
-                        if (serType.matches("Plumbing")) {
-                            userArrayList.add(user);
-                            username = ds.getValue(User.class).getUsername();
-                            userid = ds.getValue(User.class).getUserid();
-                        }
+//                        User user = new User();
+//                        user.setUsername(ds.child(userID).getValue(User.class).getUsername());
+//                        user.setEmail(ds.child(userID).getValue(User.class).getEmail());
+//                        user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
+//                        user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
+//                        user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
+
+                        UserAppointment userAppointment = new UserAppointment();
+                        userAppointment = ds.getValue(UserAppointment.class);
+                        aId = ds.getValue(UserAppointment.class).getId();
+                        aName = ds.getValue(UserAppointment.class).getName();
+                        aService = ds.getValue(UserAppointment.class).getService();
+                        aTime = ds.getValue(UserAppointment.class).getTime();
+                        aDate= ds.getValue(UserAppointment.class).getDate();
+                        userArrayList2.add(userAppointment);
                     }
                     catch (NullPointerException ignored){
                     }
-
-
                 }
                 adapter.notifyDataSetChanged();
-
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
     }
+
 
     public void ClickMenu (View view){
         //open drawer
@@ -131,23 +132,22 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
         //redirect activity to home
         NavDrawer.redirectActivity(this, NavDrawer.class);
     }
-    public void ClickProfile(View view){
+    public void ClickAbout(View view){
         //recreate activity
-        NavDrawer.redirectActivity(this, Profile.class);
+        NavDrawer.redirectActivity(this, About.class);
     }
     public void ClickDashboard(View view){
-        //Recreate activity to settings
-        NavDrawer.redirectActivity(this, Dashboard.class);
-    }
-    public void ClickAbout(View view){
         //redirect activity to settings
-        NavDrawer.redirectActivity(this, About.class);
+        recreate();
+    }
+    public void ClickProfile(View view){
+        //redirect activity to settings
+        NavDrawer.redirectActivity(this, Profile.class);
     }
     public void ClickLogout(View view){
         //logout
         NavDrawer.logout(this);
     }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -170,12 +170,8 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
 
     @Override
     public void onItemClicked(User user) {
-        Intent intentP = new Intent(this, activity_appointment.class);
-        intentP.putExtra("userid",userid);
-        intentP.putExtra("username",username);
-        intentP.putExtra("service","Plumbing");
-        finish();
-        startActivity(intentP);
+
     }
+
 }
 

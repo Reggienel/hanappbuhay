@@ -26,6 +26,6 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="ClickSettings"
+        android:onClick="ClickDashboard"
         android:src="@drawable/icon_settings" />
 </LinearLayout>

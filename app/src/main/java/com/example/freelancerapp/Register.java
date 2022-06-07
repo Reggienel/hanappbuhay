@@ -22,7 +22,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class Register extends AppCompatActivity {
     private Button button;
-    TextView textView;
     public DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     EditText etFname, etEmail, etphonenum, etPassword, etConfPassword;
@@ -42,8 +41,8 @@ public class Register extends AppCompatActivity {
         etConfPassword = findViewById(R.id.confPassword);
 
 
-        textView=(TextView)findViewById(R.id.reg_butt);
-        textView.setOnClickListener(new View.OnClickListener() {
+        button = findViewById(R.id.reg_butt);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 fname = etFname.getText().toString().trim();
@@ -59,8 +58,18 @@ public class Register extends AppCompatActivity {
                 }
                 else{
                     if(confpassword.matches(password)){
-                        createAccount(email, password);
                         //showProgressBar();
+                        if(cnumber.length() < 12) {
+                            if (cnumber.startsWith("09")) {
+                                createAccount(email, password);
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(), "Phone Number must start to 09", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(), "Phone Number must be 11 Digits", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     else{
                         Toast.makeText(getApplicationContext(), "Password did not Match", Toast.LENGTH_SHORT).show();
