@@ -37,7 +37,7 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ArrayList<User> userArrayList;
     private RecyclerView recyclerView;
-    String userID, serType, userid, username, userphonenum;
+    String userID, serType, userid, username, userphonenum, userprice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +101,7 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
                             username = ds.getValue(User.class).getUsername();
                             userid = ds.getValue(User.class).getUserid();
                             userphonenum = ds.getValue(User.class).getPhonenum();
+                            userprice = ds.getValue(User.class).getServiceprice();
                         }
                     }
                     catch (NullPointerException ignored){
@@ -176,6 +177,7 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
         intentP.putExtra("username",username);
         intentP.putExtra("service","Plumbing");
         intentP.putExtra("phonenum", userphonenum);
+        intentP.putExtra("serviceprice", userprice);
         finish();
         startActivity(intentP);
     }

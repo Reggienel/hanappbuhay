@@ -45,13 +45,14 @@ public class Profile extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
     StorageReference storageReference;
-    TextView sName, sEmail, sPhoneNumber,sService, sAvailability;
-    EditText editTextNewName,editTextNewEmail, editTextNewPassword, editTextEmail, editTextPassword ;
+    TextView sName, sEmail, sPhoneNumber,sService, sAvailability, sServicePrice;
+    EditText editTextNewName,editTextNewEmail, editTextNewPassword, editTextEmail, editTextPassword,editTextServicePrice;
     String userID;
     String name;
     String email;
     String password;
     String service;
+    String serviceprice;
     String strAvailability;
     ArrayList<String> Availability = new ArrayList<String>();
     String[] itemsService, itemsDays;
@@ -84,6 +85,8 @@ public class Profile extends AppCompatActivity {
         sPhoneNumber = findViewById(R.id.phone_num);
         sService = findViewById(R.id.service);
         sAvailability = findViewById(R.id.availability);
+        sServicePrice = findViewById(R.id.tvServicePrice);
+
         //imgProfilePic = findViewById(R.id.profilePic);
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -139,12 +142,15 @@ public class Profile extends AppCompatActivity {
             user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
             user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
             user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
+            user.setServiceprice(ds.child(userID).getValue(User.class).getServiceprice());
 
             sName.setText(user.getUsername());
             sEmail.setText(user.getEmail());
             sPhoneNumber.setText(user.getPhonenum());
             sService.setText(user.getServicetype());
-           sAvailability.setText(user.getAvailability());
+            sAvailability.setText(user.getAvailability());
+            sServicePrice.setText(user.getServiceprice());
+
 
 //            StorageReference filepath = storageReference.child("profile_picture_"+userID);
 //            filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -375,6 +381,41 @@ public class Profile extends AppCompatActivity {
         }
     }
 
+    private void serviceprice(String email, final String password) {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Get auth credentials from the user for re-authentication
+        AuthCredential credential = EmailAuthProvider.getCredential(email, password); // Current Login Credentials
+
+        // Prompt the user to re-provide their sign-in credentials
+        if(user != null) {
+            user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Log.d("value", "User re-authenticated.");
+                        //hideProgressBar();
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        updateRealData(5);
+                        Toast.makeText(getApplicationContext(), "Set Service Price",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        //hideProgressBar();
+                        Toast.makeText(getApplicationContext(), "Set Service Price Failed",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+        else{
+            //hideProgressBar();
+            Toast.makeText(getApplicationContext(), "Set Service Price Failed",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void updateRealData(int i){
         mDatabase.child("users").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -397,6 +438,9 @@ public class Profile extends AppCompatActivity {
                     strAvailability = sb.toString();
                     Log.d("User", strAvailability);
                     dataSnapshot.getRef().child("availability").setValue(strAvailability);}
+                else if( i == 5){
+                      serviceprice = editTextServicePrice.getText().toString();dataSnapshot.getRef().child("serviceprice").setValue(serviceprice+"$");
+                    }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -487,6 +531,8 @@ public class Profile extends AppCompatActivity {
         LayoutInflater factory = LayoutInflater.from(Profile.this);
         final View textEntryView = factory.inflate(R.layout.dialog_service_type, null);
 
+        editTextServicePrice = (EditText) textEntryView.findViewById(R.id.editTextServicePrice);
+
         dropdown = textEntryView.findViewById(R.id.spAvailability);
 //create a list of items for the spinner.
         itemsService = new String[]{"Cleaning", "Laundry", "Plumbing", "Electrical", "Employer"};
@@ -507,8 +553,9 @@ public class Profile extends AppCompatActivity {
 
                 Log.i("111111", editTextEmail.getText().toString());
                 Log.i("111111", editTextPassword.getText().toString());
-                if (!editTextEmail.getText().toString().matches("") || !editTextPassword.getText().toString().matches("")) {
+                if (!editTextServicePrice.getText().toString().matches("") || !editTextEmail.getText().toString().matches("") || !editTextPassword.getText().toString().matches("")) {
                         servicetype(editTextEmail.getText().toString(), editTextPassword.getText().toString());
+                        serviceprice(editTextEmail.getText().toString(), editTextPassword.getText().toString());
                 }
                 else{
 
@@ -561,7 +608,6 @@ public class Profile extends AppCompatActivity {
         });
         ad1.show();// Show dialog
     }
-
 
     public void dialogChangeEmail(){
         LayoutInflater factory = LayoutInflater.from(Profile.this);
@@ -658,6 +704,7 @@ public class Profile extends AppCompatActivity {
                 });
         return builder.show();
     }
+
     public void ClickMenu (View view){
         //open drawer
         NavDrawer.openDrawer(drawerLayout);

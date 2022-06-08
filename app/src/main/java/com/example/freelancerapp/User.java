@@ -8,7 +8,7 @@ public class User {
     public String phonenum;
     public String service_type;
     public String availability;
-//    public String appointment;
+    public String serviceprice;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -70,8 +70,8 @@ public class User {
 
     public void setAvailabity(String availability) { this.availability = availability; }
 
-//    public String getAppointment() { return appointment; }
-//
-//    public void setAppointment(String appointment) { this.appointment = appointment; }
+    public String getServiceprice() { return serviceprice; }
+
+    public void setServiceprice(String serviceprice) { this.serviceprice = serviceprice; }
 }
 

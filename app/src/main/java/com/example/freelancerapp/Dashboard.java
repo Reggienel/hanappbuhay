@@ -112,6 +112,7 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
                         aTime = ds.getValue(UserAppointment.class).getTime();
                         aDate= ds.getValue(UserAppointment.class).getDate();
                         userArrayList2.add(userAppointment);
+                        Log.d("TAG", "onDataChange: "+aName);
                     }
                     catch (NullPointerException ignored){
                     }
@@ -176,59 +177,134 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
 
     @Override
     public void onItemClicked(UserAppointment userAppointment) {
+        if(userAppointment.getName().startsWith("Employee")){
         Intent intentCheckOut = new Intent(this, CheckoutActivityJava.class);
         intentCheckOut.putExtra("aId",userAppointment.getId());
+        intentCheckOut.putExtra("serviceprice",userAppointment.getServiceprice());
+            Log.d("TAG", "onItemClicked: "+userAppointment.getId());
         finish();
         startActivity(intentCheckOut);
-    }
+        }
+        else{
+            AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
+            ad1.setTitle("Confirmation:");
+            ad1.setIcon(android.R.drawable.ic_dialog_info);
+            ad1.setMessage("Are you sure the appointment with " + userAppointment.getName() + " on " + userAppointment.getDate() + " at " + userAppointment.getTime() + " is Done and Paid?");
+            ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int i) {
 
+
+                }
+            });
+
+            ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int i) {
+
+                }
+            });
+            ad1.show();// Show dialog
+        }
+    }
 
 
     @Override
     public void onItemClickedCancel(UserAppointment userAppointment) {
-        mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
-                ad1.setTitle("Confirmation:");
-                ad1.setIcon(android.R.drawable.ic_dialog_info);
-                ad1.setMessage("Are you sure you want to cancel your appointment with " + userAppointment.getName() + " on " + userAppointment.getDate() + " at " + userAppointment.getTime() +" ?");
-                ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int i) {
+        if(userAppointment.getName().startsWith("Employee")) {
+            mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
+                    ad1.setTitle("Confirmation:");
+                    ad1.setIcon(android.R.drawable.ic_dialog_info);
+                    ad1.setMessage("Are you sure you want to cancel your appointment with " + userAppointment.getName() + " on " + userAppointment.getDate() + " at " + userAppointment.getTime() + " ?");
+                    ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
                             dataSnapshot.getRef().child(String.valueOf(userAppointment.getId())).removeValue();
-                            Toast.makeText(getApplicationContext(),  "Appointment Cancelled",
-                            Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Appointment Cancelled",
+                                    Toast.LENGTH_SHORT).show();
                             mDatabase.child("bookings").child(userAppointment.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     dataSnapshot.getRef().child(userID).removeValue();
-                                    Toast.makeText(getApplicationContext(),  "Employee Notified",
+                                    Toast.makeText(getApplicationContext(), "Employee Notified",
                                             Toast.LENGTH_SHORT).show();
-                                            recreate();
+                                    finish();
+                                    recreate();
                                 }
+
                                 public void onCancelled(DatabaseError databaseError) {
-                                    Toast.makeText(getApplicationContext(),"Employee Not Notified",
+                                    Toast.makeText(getApplicationContext(), "Employee Not Notified",
                                             Toast.LENGTH_SHORT).show();
                                     Log.d("User", databaseError.getMessage());
                                 }
                             });
 
-                    }
-                });
+                        }
+                    });
 
-                ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int i) {
+                    ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
 
-                    }
-                });
-                ad1.show();// Show dialog
+                        }
+                    });
+                    ad1.show();// Show dialog
 
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d("User", databaseError.getMessage());
-            }
-        });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("User", databaseError.getMessage());
+                }
+            });
+        }
+        else{
+            mDatabase.child("bookings").child(userAppointment.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
+                    ad1.setTitle("Confirmation:");
+                    ad1.setIcon(android.R.drawable.ic_dialog_info);
+                    ad1.setMessage("Are you sure you want to cancel your appointment with " + aName + " on " + aDate + " at " + aTime + " ?");
+                    ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
+                            dataSnapshot.getRef().child(userID).removeValue();
+                            Toast.makeText(getApplicationContext(), "Appointment Cancelled",
+                                    Toast.LENGTH_SHORT).show();
+                            mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    dataSnapshot.getRef().child(aId).removeValue();
+                                    Toast.makeText(getApplicationContext(), "Employer Notified",
+                                            Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    recreate();
+                                }
+
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Toast.makeText(getApplicationContext(), "Employer Not Notified",
+                                            Toast.LENGTH_SHORT).show();
+                                    Log.d("User", databaseError.getMessage());
+                                }
+                            });
+
+                        }
+                    });
+
+                    ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
+
+                        }
+                    });
+                    ad1.show();// Show dialog
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("User", databaseError.getMessage());
+                }
+            });
+        }
     }
 
     @Override

@@ -3,7 +3,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
@@ -20,8 +19,24 @@
         android:spinnerMode="dropdown"
         android:textSize="18sp">
         <requestFocus />
-    </Spinner>
 
+
+    </Spinner>
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Service Price"
+        android:textSize="18sp" />
+
+
+    <EditText
+        android:id="@+id/editTextServicePrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text|number"
+        android:hint="10USD"
+        android:textSize="18sp"/>
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"

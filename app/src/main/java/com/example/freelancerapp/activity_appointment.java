@@ -37,7 +37,7 @@ import java.util.Locale;
 public class activity_appointment extends AppCompatActivity {
     private DatePickerDialog datePickerDialog;
     private Button datebutton, timebutton, appointbutton;
-    private TextView tvDate, tvTime, tvname_of_provider;
+    private TextView tvDate, tvTime, tvname_of_provider, tvprice;
     int hour, minute;
     public DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
@@ -45,13 +45,14 @@ public class activity_appointment extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     FirebaseUser fUser;
     public String newUserName;
-    String selectedDate, selectedTime, newUserID, newService, newPhoneNum;
+    String selectedDate, selectedTime, newUserID, newService, newPhoneNum, newPrice;
     String userID, username, userphonenum;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_appointment);
         tvname_of_provider = findViewById(R.id.provider);
+        tvprice = findViewById(R.id.price);
 
         initDatePicker();
         datebutton = findViewById(R.id.setdate);
@@ -77,20 +78,24 @@ public class activity_appointment extends AppCompatActivity {
                 newUserID= null;
                 newService= null;
                 newPhoneNum= null;
+                newPrice = null;
             } else {
                 newUserName= extras.getString("username");
                 newUserID= extras.getString("userid");
                 newService= extras.getString("service");
                 newPhoneNum= extras.getString("phonenum");
+                newPrice= extras.getString("serviceprice");
                 tvname_of_provider.setText(newUserName);
-
+                tvprice.setText(newPrice);
             }
         } else {
             newUserName = (String) savedInstanceState.getSerializable("username");
             newUserID = (String) savedInstanceState.getSerializable("userid");
             newService = (String) savedInstanceState.getSerializable("service");
             newPhoneNum = (String) savedInstanceState.getSerializable("phonenum");
+            newPrice = (String) savedInstanceState.getSerializable("serviceprice");
             tvname_of_provider.setText(newUserName);
+            tvprice.setText(newPrice);
         }
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -141,6 +146,7 @@ public class activity_appointment extends AppCompatActivity {
                                     dataSnapshot.getRef().child(newUserID).child("time").setValue(selectedTime);
                                     dataSnapshot.getRef().child(newUserID).child("payment").setValue("Not Paid");
                                     dataSnapshot.getRef().child(newUserID).child("phonenum").setValue(newPhoneNum);
+                                    dataSnapshot.getRef().child(newUserID).child("serviceprice").setValue(newPrice);
 
                                     notifyEmployee();
                                     Toast.makeText(getApplicationContext(),"Appointment Save",
@@ -182,6 +188,7 @@ public class activity_appointment extends AppCompatActivity {
             user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
             user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
             user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
+            user.setServiceprice(ds.child(userID).getValue(User.class).getServiceprice());
 
             username = user.getUsername();
             userphonenum = user.getPhonenum();

@@ -8,8 +8,7 @@ public class UserAppointment {
     public String time;
     public String payment;
     public String phonenum;
-//    public String phonenum;
-//    public String service_type;
+    public String serviceprice;
 //    public String availability;
 //    public String appointment;
 
@@ -62,14 +61,10 @@ public class UserAppointment {
     public String getPhonenum() { return phonenum; }
 
     public void setPhonenum(String phonenum) { this.phonenum = phonenum; }
-//
-//    public UserAppointment(String serviceType) {
-//        this. service_type = serviceType;
-//    }
-//
-//    public String getServicetype() { return service_type; }
-//
-//    public void setServicetype(String service_type) { this.service_type = service_type; }
+
+    public String getServiceprice() { return serviceprice; }
+
+    public void setServiceprice(String serviceprice) { this.serviceprice = serviceprice; }
 //
 //    public String getAvailability() { return availability; }
 //

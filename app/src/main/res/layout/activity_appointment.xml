@@ -63,6 +63,23 @@
                 android:focusable="true" />
 
         </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="PRICE"
+                android:textColor="#339933"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </TableRow>
 
         <TableRow
             android:layout_width="match_parent"

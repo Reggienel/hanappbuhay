@@ -126,6 +126,26 @@
                     android:text="N/A"
                     android:textColor="#FF1493" />
             </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView21"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Service Price:"
+                    android:textColor="#339933" />
+
+                <TextView
+                    android:id="@+id/tvServicePrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="N/A"
+                    android:textColor="#FF1493" />
+            </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"

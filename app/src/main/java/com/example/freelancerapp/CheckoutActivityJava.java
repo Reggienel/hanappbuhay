@@ -62,8 +62,8 @@ public class CheckoutActivityJava extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    private String aId;
-    private String userID, username;
+    private String aId, serprice;
+    private String userID, userPaymentPrice;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,12 +91,18 @@ public class CheckoutActivityJava extends AppCompatActivity {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
                 aId = null;
+                serprice = null;
             } else {
                 aId = extras.getString("aId");
+                serprice = extras.getString("serviceprice");
+                amountTextView.setText(serprice);
                 Log.d("aId",aId);
+                Log.d("aId",serprice.replace("$",""));
             }
         } else {
             aId = (String) savedInstanceState.getSerializable("aId");
+            serprice = (String) savedInstanceState.getSerializable("serviceprice");
+            amountTextView.setText(serprice);
         }
 
         mAuth = FirebaseAuth.getInstance();
@@ -105,18 +111,6 @@ public class CheckoutActivityJava extends AppCompatActivity {
         userID = fUser.getUid();
         mDatabase = mFirebaseDatabase.getReference();
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                showData(snapshot);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
 
         // Configure the SDK with your Stripe publishable key so it can make requests to Stripe
         stripe = new Stripe(
@@ -124,46 +118,31 @@ public class CheckoutActivityJava extends AppCompatActivity {
                 Objects.requireNonNull("pk_test_51L85Z1DBo3wrAMKB7RAgXHVre1no0Xzyz5DZCW18EA3kVJAMEzexIQYzj2bRjL43kaVWbHOpSkGBfC7zcqIHzF5g00CP4XyJcT")
         );
         startCheckout();
-    }
-
-    private void showData(DataSnapshot snapshot) {
-        for (DataSnapshot ds : snapshot.getChildren()){
-            User user = new User();
-            user.setUsername(ds.child(userID).getValue(User.class).getUsername());
-            user.setEmail(ds.child(userID).getValue(User.class).getEmail());
-            user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
-            user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
-            user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
-
-            username = ds.getValue(User.class).getUsername();
-//            StorageReference filepath = storageReference.child("profile_picture_"+userID);
-//            filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                @Override
-//                public void onSuccess(Uri uri) {
-//                    Picasso.get().load(uri).into(imgProfilePic);
-//                }
-//            }).addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception exception) {
-//                    Log.d("View Profile", "No Upload Profile");
-//                }
-//            });
-        }
+//        userPaymentPrice = ds.getValue(User.class).getServiceprice();
+//        Log.d("TAG", "showData: "+ userPaymentPrice);
+//        amountTextView.setText(userPaymentPrice);
     }
 
     private void updatePayment() {
         mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                dataSnapshot.getRef().child(aId).child("payment").setValue(amountTextView.getText().toString()+"$");
-                Log.d("payment", aId );
-                Log.d("payment", amountTextView.getText().toString() );
-                Toast.makeText(getApplicationContext(),  "updatePayment",
-                        Toast.LENGTH_SHORT).show();
+                dataSnapshot.getRef().child(aId).child("payment").setValue(serprice);
+                mDatabase.child("bookings").child(aId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        dataSnapshot.getRef().child(userID).child("payment").setValue(serprice);
+                        Toast.makeText(getApplicationContext(),  "updatePayment",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Toast.makeText(getApplicationContext(),"updatePaymentFailed",
+                                Toast.LENGTH_SHORT).show();
+                        Log.d("payment", databaseError.getMessage());
+                    }
+                });
             }
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("payment", aId );
-                Log.d("payment", amountTextView.getText().toString() );
                 Toast.makeText(getApplicationContext(),"updatePaymentFailed",
                         Toast.LENGTH_SHORT).show();
                 Log.d("payment", databaseError.getMessage());
@@ -175,7 +154,7 @@ public class CheckoutActivityJava extends AppCompatActivity {
         // Create a PaymentIntent by calling the server's endpoint.
         MediaType mediaType = MediaType.get("application/json; charset=utf-8");
 
-        double amount = Double.valueOf(amountTextView.getText().toString()) * 100;
+        double amount = Double.valueOf(serprice.replace("$","")) * 100;
 
         Map<String, Object> payMap = new HashMap<>();
         Map<String, Object> itemMap = new HashMap<>();
