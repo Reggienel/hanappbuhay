@@ -235,6 +235,7 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
     public void onItemClickedMessage(UserAppointment userAppointment) {
         Uri uri = Uri.parse("smsto:"+userAppointment.getPhonenum());
         Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+        finish();
         startActivity(intent);
     }
 

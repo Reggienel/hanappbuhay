@@ -146,6 +146,7 @@ public class activity_appointment extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(),"Appointment Save",
                                             Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(activity_appointment.this, Dashboard.class);
+                                    finish();
                                     startActivity(intent);}
                                 else{
                                     Toast.makeText(getApplicationContext(),"Please Set Time and Date",
