@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/drawer_layout"
-    android:background="@null"
+    android:background="#fff5f6"
     tools:context=".Profile">
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             android:layout_width="171dp"
             android:layout_height="192dp"
             android:layout_gravity="center"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:background="@null"
             android:clickable="true"
@@ -53,7 +53,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="Location:"
-                    android:textColor="#339933" />
+                    android:textColor="#339933"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/location"
@@ -61,7 +62,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="ANGELES CITY"
-                    android:textColor="#FF1493" />
+                    android:textColor="#FF1493"
+                    android:textSize="18sp" />
             </TableRow>
 
             <TableRow
@@ -74,7 +76,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="Mobile Number:"
-                    android:textColor="#339933" />
+                    android:textColor="#339933"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/phone_num"
@@ -82,7 +85,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="09123456789"
-                    android:textColor="#FF1493" />
+                    android:textColor="#FF1493"
+                    android:textSize="18sp" />
             </TableRow>
 
             <TableRow
@@ -95,7 +99,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="Email Address:"
-                    android:textColor="#339933" />
+                    android:textColor="#339933"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/email_add"
@@ -103,7 +108,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="example@sample.com"
-                    android:textColor="#FF1493" />
+                    android:textColor="#FF1493"
+                    android:textSize="18sp" />
             </TableRow>
 
             <TableRow
@@ -116,7 +122,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="Service Type:"
-                    android:textColor="#339933" />
+                    android:textColor="#339933"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/service"
@@ -124,19 +131,21 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="N/A"
-                    android:textColor="#FF1493" />
+                    android:textColor="#FF1493"
+                    android:textSize="18sp" />
             </TableRow>
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/textView21"
+                    android:id="@+id/textViewSer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="Service Price:"
-                    android:textColor="#339933" />
+                    android:textColor="#339933"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/tvServicePrice"
@@ -144,7 +153,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="N/A"
-                    android:textColor="#FF1493" />
+                    android:textColor="#FF1493"
+                    android:textSize="18sp" />
             </TableRow>
 
             <TableRow
@@ -157,7 +167,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="Availability:"
-                    android:textColor="#339933" />
+                    android:textColor="#339933"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/availability"
@@ -165,7 +176,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="N/A"
-                    android:textColor="#FF1493" />
+                    android:textColor="#FF1493"
+                    android:textSize="18sp" />
             </TableRow>
         </TableLayout>
 
@@ -176,7 +188,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:layout_marginRight="40dp"
-            android:layout_marginTop="20dp"
+
             android:background="@drawable/button"
             android:text="Edit Info" />
 

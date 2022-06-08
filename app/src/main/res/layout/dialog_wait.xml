@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text="Please wait..."
+        android:textColor="#FF69B4"
         android:textSize="10sp" />
 
     <ProgressBar

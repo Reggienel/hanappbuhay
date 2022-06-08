@@ -5,6 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#fff5f6"
     android:transitionName="sdhj"
     android:visibility="visible"
     tools:context=".Plumbing"
@@ -28,10 +29,6 @@
             android:textColor="#FF69B4"
             android:textSize="24sp"
             android:textStyle="bold" />
-
-        <SearchView
-            android:layout_width="match_parent"
-            android:layout_height="36dp" />
 
         <ScrollView
             android:layout_width="match_parent"

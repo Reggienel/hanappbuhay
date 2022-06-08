@@ -5,28 +5,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/drawer_layout"
+    android:background="#fff5f6"
     tools:context=".Dashboard">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
         <include layout="@layout/main_toolbar" />
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#fff5f6">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#fff5f6">
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycleviewdb"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-    </ScrollView>
+        </ScrollView>
     </LinearLayout>
     <RelativeLayout
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@android:color/white">
-        <include layout="@layout/main_nav_drawer"/>
+
+        <include layout="@layout/main_nav_drawer" />
     </RelativeLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>

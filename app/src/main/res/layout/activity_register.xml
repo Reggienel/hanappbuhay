@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#fff5f6"
     android:gravity="center"
     tools:context=".Register">
     <LinearLayout
@@ -15,8 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="50dp"
-            android:paddingTop="30dp"
+            android:layout_margin="15dp"
+
             android:text="Register"
             android:textColor="#339933"
             android:textSize="30sp"
@@ -92,6 +93,17 @@
             android:padding="20dp"
             />
 
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:clickable="true"
+            android:text="I accept the Terms and Conditions"
+            android:textColor="#339933"
+            android:textSize="16sp" />
+
         <Button
             android:id="@+id/reg_butt"
             android:layout_width="300dp"
@@ -106,7 +118,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="10dp"
             android:text="Already have an account?"
             android:textColor="#339933"
             android:textSize="15sp"
