@@ -71,9 +71,9 @@ public class About extends AppCompatActivity {
         //recreate activity
         recreate();
     }
-    public void ClickSettings(View view){
+    public void ClickDashboard(View view){
         //redirect activity to settings
-        NavDrawer.redirectActivity(this, Settings.class);
+        NavDrawer.redirectActivity(this, Dashboard.class);
     }
     public void ClickProfile(View view){
         //redirect activity to settings

@@ -3,7 +3,7 @@ package com.example.freelancerapp;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,7 +15,7 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
     private ArrayList<UserAppointment> userArrayList = new ArrayList<>();
     private OnNoteListenerdashboard listenerdb;
 
-    public recyclerAdapterDashboard(ArrayList<UserAppointment> userArrayList, OnNoteListenerdashboard listenedb){
+    public recyclerAdapterDashboard(ArrayList<UserAppointment> userArrayList, OnNoteListenerdashboard listenerdb){
         this.userArrayList = userArrayList;
         this.listenerdb = listenerdb;
     }
@@ -33,17 +33,31 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
         String service = userArrayList.get(position).getService();
         String time = userArrayList.get(position).getTime();
         String date = userArrayList.get(position).getDate();
+        String payment = userArrayList.get(position).getPayment();
 
         holder.nameTxt.setText(name);
         holder.serviceTxt.setText(service);
         holder.dateTxt.setText(date);
         holder.timeTxt.setText(time);
-//        holder.imgClick.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                listenerdb.onItemClicked(userArrayList.get(holder.getAdapterPosition()));
-//            }
-//        });
+        holder.paymentTxt.setText(payment);
+        holder.markAsDoneBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listenerdb.onItemClicked(userArrayList.get(holder.getAdapterPosition()));
+            }
+        });
+        holder.cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listenerdb.onItemClickedCancel(userArrayList.get(holder.getAdapterPosition()));
+            }
+        });
+        holder.msgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listenerdb.onItemClickedMessage(userArrayList.get(holder.getAdapterPosition()));
+            }
+        });
     }
 
     @Override
@@ -52,8 +66,8 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
-        private TextView nameTxt, serviceTxt,timeTxt,dateTxt;
-        private ImageView imgClick;
+        private TextView nameTxt, serviceTxt,timeTxt,dateTxt,paymentTxt;
+        private Button markAsDoneBtn, cancelBtn, msgBtn;
 
         public MyViewHolder(final View view, OnNoteListenerdashboard listener){
             super(view);
@@ -61,7 +75,10 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
             serviceTxt = view.findViewById(R.id.service_dboard);
             dateTxt = view.findViewById(R.id.date_dboard);
             timeTxt = view.findViewById(R.id.time_dboard);
-            //imgClick = view.findViewById(R.id.imageView);
+            paymentTxt = view.findViewById(R.id.payment);
+            markAsDoneBtn = view.findViewById(R.id.btnMarkAsDone);
+            cancelBtn = view.findViewById(R.id.btnCancelAppointment);
+            msgBtn = view.findViewById(R.id.btnMsg);
         }
     }
 }

@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FreelancerApp">
         <activity
+            android:name=".CheckoutActivityJava"
+            android:exported="false" />
+        <activity
             android:name=".activity_appointment"
             android:exported="false" />
         <activity

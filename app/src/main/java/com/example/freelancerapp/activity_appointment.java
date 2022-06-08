@@ -45,7 +45,8 @@ public class activity_appointment extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     FirebaseUser fUser;
     public String newUserName;
-    String userID, selectedDate, selectedTime, newUserID, username, newService;
+    String selectedDate, selectedTime, newUserID, newService, newPhoneNum;
+    String userID, username, userphonenum;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,10 +76,12 @@ public class activity_appointment extends AppCompatActivity {
                 newUserName= null;
                 newUserID= null;
                 newService= null;
+                newPhoneNum= null;
             } else {
                 newUserName= extras.getString("username");
                 newUserID= extras.getString("userid");
                 newService= extras.getString("service");
+                newPhoneNum= extras.getString("phonenum");
                 tvname_of_provider.setText(newUserName);
 
             }
@@ -86,6 +89,7 @@ public class activity_appointment extends AppCompatActivity {
             newUserName = (String) savedInstanceState.getSerializable("username");
             newUserID = (String) savedInstanceState.getSerializable("userid");
             newService = (String) savedInstanceState.getSerializable("service");
+            newPhoneNum = (String) savedInstanceState.getSerializable("phonenum");
             tvname_of_provider.setText(newUserName);
         }
 
@@ -135,6 +139,8 @@ public class activity_appointment extends AppCompatActivity {
                                     dataSnapshot.getRef().child(newUserID).child("service").setValue(newService);
                                     dataSnapshot.getRef().child(newUserID).child("date").setValue(selectedDate);
                                     dataSnapshot.getRef().child(newUserID).child("time").setValue(selectedTime);
+                                    dataSnapshot.getRef().child(newUserID).child("payment").setValue("Not Paid");
+                                    dataSnapshot.getRef().child(newUserID).child("phonenum").setValue(newPhoneNum);
 
                                     notifyEmployee();
                                     Toast.makeText(getApplicationContext(),"Appointment Save",
@@ -147,6 +153,7 @@ public class activity_appointment extends AppCompatActivity {
                                 }
                             }
                         });
+
                         ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int i) {
 
@@ -176,6 +183,7 @@ public class activity_appointment extends AppCompatActivity {
             user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
 
             username = user.getUsername();
+            userphonenum = user.getPhonenum();
 //            StorageReference filepath = storageReference.child("profile_picture_"+userID);
 //            filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
 //                @Override
@@ -200,6 +208,9 @@ public class activity_appointment extends AppCompatActivity {
                 dataSnapshot.getRef().child(userID).child("service").setValue(newService);
                 dataSnapshot.getRef().child(userID).child("date").setValue(selectedDate);
                 dataSnapshot.getRef().child(userID).child("time").setValue(selectedTime);
+                dataSnapshot.getRef().child(userID).child("payment").setValue("Not Paid");
+                dataSnapshot.getRef().child(userID).child("phonenum").setValue(userphonenum);
+
                 Log.d("User",username);
 //                dataSnapshot.getRef().child("employee_appointment").child(username).child(userID).child("date").setValue(selectedDate);
 //                dataSnapshot.getRef().child("employee_appointment").child(username).child(userID).child("time").setValue(selectedTime);

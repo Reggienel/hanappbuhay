@@ -38,7 +38,7 @@ public class Cleaning extends AppCompatActivity implements OnNoteListener{
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ArrayList<User> userArrayList;
     private RecyclerView recyclerView;
-    String userID, serType, userid, username;
+    String userID, serType, userid, username, userphonenum;
 
     @Override
     public void onBackPressed(){
@@ -109,6 +109,7 @@ public class Cleaning extends AppCompatActivity implements OnNoteListener{
                             userArrayList.add(user);
                             username = ds.getValue(User.class).getUsername();
                             userid = ds.getValue(User.class).getUserid();
+                            userphonenum = ds.getValue(User.class).getPhonenum();
                         }
                     }
                     catch (NullPointerException ignored){
@@ -183,6 +184,7 @@ public class Cleaning extends AppCompatActivity implements OnNoteListener{
         intentC.putExtra("userid",userid);
         intentC.putExtra("username",username);
         intentC.putExtra("service","Cleaning");
+        intentC.putExtra("phonenum", userphonenum);
         finish();
         startActivity(intentC);
     }

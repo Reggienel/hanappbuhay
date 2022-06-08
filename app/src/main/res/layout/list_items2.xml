@@ -3,13 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main_container">
+    android:id="@+id/main_container2">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:focusable="true">
 
 
         <ScrollView
@@ -96,14 +97,14 @@
                         android:layout_height="match_parent" />
 
                     <TextView
-                        android:id="@+id/meet_place_dboard"
+                        android:id="@+id/payment"
                         android:layout_width="235dp"
                         android:layout_height="wrap_content"
                         android:background="#FFC0CB"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="Near 7/11"
+                        android:text="Not Paid"
                         android:textColor="#339933"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -115,31 +116,36 @@
                         android:layout_marginBottom="5dp"
                         android:gravity="center">
                         <Button
-                            android:id="@+id/button4"
+                            android:id="@+id/btnCancelAppointment"
                             android:layout_width="130dp"
                             android:layout_height="wrap_content"
                             android:background="#98FB98"
-                            android:text="Cancel"/>
+                            android:text="Cancel"
+                            android:clickable="true"
+                            android:focusable="true"/>
 
 
 
                         <Button
-                            android:id="@+id/button5"
+                            android:id="@+id/btnMsg"
                             android:layout_width="130dp"
                             android:layout_height="wrap_content"
                             android:background="#98FB98"
                             android:layout_marginHorizontal="10dp"
                             android:text="Message"
+                            android:clickable="true"
+                            android:focusable="true"
                             />
 
 
                         <Button
-                            android:id="@+id/button3"
+                            android:id="@+id/btnMarkAsDone"
                             android:layout_width="130dp"
                             android:layout_height="wrap_content"
                             android:background="#FFC0CB"
-                            android:text="Mark as done"
-                            />
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="Mark as done" />
                     </TableRow>
                 </TableLayout>
         </ScrollView>

@@ -1,11 +1,16 @@
 package com.example.freelancerapp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,13 +34,14 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
     TextView textView;
     //initialize variable
     DrawerLayout drawerLayout;
-    public DatabaseReference mDatabase, appoint;
+    public DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ArrayList<UserAppointment> userArrayList2;
     private RecyclerView recyclerView;
-    String userID, aId, aName, aService, aTime, aDate;
+    String  aId, aName, aService, aTime, aDate;
+    String userID, username; // info current user
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +72,7 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
                 }
             }
         };
+
 
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -118,7 +125,6 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
         });
     }
 
-
     public void ClickMenu (View view){
         //open drawer
         NavDrawer.openDrawer(drawerLayout);
@@ -169,8 +175,67 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
     }
 
     @Override
-    public void onItemClicked(User user) {
+    public void onItemClicked(UserAppointment userAppointment) {
+        Intent intentCheckOut = new Intent(this, CheckoutActivityJava.class);
+        intentCheckOut.putExtra("aId",userAppointment.getId());
+        finish();
+        startActivity(intentCheckOut);
+    }
 
+
+
+    @Override
+    public void onItemClickedCancel(UserAppointment userAppointment) {
+        mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
+                ad1.setTitle("Confirmation:");
+                ad1.setIcon(android.R.drawable.ic_dialog_info);
+                ad1.setMessage("Are you sure you want to cancel your appointment with " + userAppointment.getName() + " on " + userAppointment.getDate() + " at " + userAppointment.getTime() +" ?");
+                ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int i) {
+                            dataSnapshot.getRef().child(String.valueOf(userAppointment.getId())).removeValue();
+                            Toast.makeText(getApplicationContext(),  "Appointment Cancelled",
+                            Toast.LENGTH_SHORT).show();
+                            mDatabase.child("bookings").child(userAppointment.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    dataSnapshot.getRef().child(userID).removeValue();
+                                    Toast.makeText(getApplicationContext(),  "Employee Notified",
+                                            Toast.LENGTH_SHORT).show();
+                                            recreate();
+                                }
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Toast.makeText(getApplicationContext(),"Employee Not Notified",
+                                            Toast.LENGTH_SHORT).show();
+                                    Log.d("User", databaseError.getMessage());
+                                }
+                            });
+
+                    }
+                });
+
+                ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int i) {
+
+                    }
+                });
+                ad1.show();// Show dialog
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("User", databaseError.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void onItemClickedMessage(UserAppointment userAppointment) {
+        Uri uri = Uri.parse("smsto:"+userAppointment.getPhonenum());
+        Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+        startActivity(intent);
     }
 
 }
