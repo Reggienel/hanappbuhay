@@ -1,6 +1,7 @@
 package com.example.freelancerapp;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -215,8 +216,112 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
     @Override
     public void onItemClicked(UserAppointment userAppointment) {
         if(userAppointment.getName().startsWith("Employee")){
-            ratingDialog(userAppointment);
-            //checkOut(userAppointment);
+            LayoutInflater factory = LayoutInflater.from(Dashboard.this);
+            final View textEntryView = factory.inflate(R.layout.dialog_rate_user, null);
+            String TAG = "Firestore";
+
+            ratingBar = textEntryView.findViewById(R.id.dialogRatingBar);
+
+            AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
+            ad1.setTitle("Rate the User?:");
+            ad1.setIcon(android.R.drawable.ic_dialog_info);
+            ad1.setView(textEntryView);
+            ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int i) {
+                    ratingValue = ratingBar.getRating();
+
+                    mDatabase.child("bookings").child(aId).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot ds : snapshot.getChildren()) {
+                                try {
+                                    String Name;
+                                    String Service;
+                                    String Price;
+
+                                    UserAppointment userA = new UserAppointment();
+                                    userA = ds.getValue(UserAppointment.class);
+                                    Name = ds.getValue(UserAppointment.class).getName();
+                                    Service = ds.getValue(UserAppointment.class).getService();
+                                    Price = ds.getValue(UserAppointment.class).getServiceprice();
+                                    userArrayList2.add(userA);
+
+                                    Map<String, Object> review = new HashMap<>();
+                                    review.put("reviewerName", Name);
+
+                                    review.put("reviewId", userAppointment.getId());
+                                    review.put("reviewName", userAppointment.getName());
+                                    review.put("reviewRating", ratingValue);
+
+                                    // Add a new document with a generated ID
+                                    db.collection("users_review")
+                                            .add(review)
+                                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                @Override
+                                                public void onSuccess(DocumentReference documentReference) {
+                                                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.w(TAG, "Error adding document", e);
+                                                }
+                                            });
+                                    db.collection("users_review")
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @RequiresApi(api = Build.VERSION_CODES.N)
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                            if(document.get("reviewId").equals(userAppointment.getId())){
+                                                                Log.d(TAG, document.getId() + " => " + document.get("reviewRating"));
+                                                                arr.add((Double) document.get("reviewRating"));
+                                                            }
+                                                        }
+                                                        double totalarr = arr.stream().mapToDouble(Double::doubleValue).sum();
+                                                        double finalRate = totalarr / arr.size();
+
+                                                        mDatabase.child("users").child(userAppointment.getId()).child("rating").setValue(String.valueOf(finalRate));
+
+                                                        Intent intentCheckOut = new Intent(getApplicationContext(), CheckoutActivityJava.class);
+                                                        intentCheckOut.putExtra("aId",userAppointment.getId());
+                                                        intentCheckOut.putExtra("serviceprice",userAppointment.getServiceprice());
+
+                                                        Log.d("TAG", "onItemClicked: "+userAppointment.getId());
+                                                        finish();
+                                                        startActivity(intentCheckOut);
+                                                        Log.d(TAG, Arrays.toString(new List[]{arr}));
+                                                        Log.d(TAG, "Total " + finalRate);
+                                                    }
+                                                    else {
+                                                        Log.w(TAG, "Error getting documents.", task.getException());
+                                                    }
+                                                }
+                                            });
+                                    Log.d(TAG, "onClick: "+ratingValue);
+                                }
+                                catch (NullPointerException ignored){
+                                }
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+                }
+            });
+
+            ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int i) {
+
+                }
+            });
+            ad1.show();// Show dialog
         }
         else{
                 AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
