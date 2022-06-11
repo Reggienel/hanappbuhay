@@ -106,7 +106,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:text="06/5/2022"
+                android:text="DATE"
                 android:textColor="#339933"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -136,7 +136,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:text="5:00 PM"
+                android:text="TIME"
                 android:textColor="#339933"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -165,7 +165,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:text="Meet Up Place"
+                android:text="MEET-UP PLACE"
                 android:textColor="#339933"
                 android:textSize="16sp"
                 android:textStyle="bold" />

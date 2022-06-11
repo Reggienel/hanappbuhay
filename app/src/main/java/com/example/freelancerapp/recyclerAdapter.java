@@ -42,9 +42,9 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
 
         if(image != null){Glide.with(holder.imgClick.getContext()).load(image).into(holder.imgClick);}
         if(location != null){holder.locationTxt.setText(location);}
-        holder.nameTxt.setText(name);
-        holder.ratingBar.setRating(Float.parseFloat(ratingValue));
+        if(ratingValue != null){holder.ratingBar.setRating(Float.parseFloat(ratingValue));}
 
+        holder.nameTxt.setText(name);
 
         Log.d("URI", "onSuccess: "+image);
 

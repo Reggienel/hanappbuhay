@@ -218,7 +218,7 @@ public class Profile extends AppCompatActivity {
 
     private void showData(DataSnapshot snapshot) {
         for (DataSnapshot ds : snapshot.getChildren()){
-            try {
+
                 User user = new User();
                 user.setUsername(ds.child(userID).getValue(User.class).getUsername());
                 user.setEmail(ds.child(userID).getValue(User.class).getEmail());
@@ -228,12 +228,13 @@ public class Profile extends AppCompatActivity {
                 user.setServiceprice(ds.child(userID).getValue(User.class).getServiceprice());
                 user.setLocation(ds.child(userID).getValue(User.class).getLocation());
                 user.setRating(ds.child(userID).getValue(User.class).getRating());
-
+             try {
                 sName.setText(user.getUsername());
                 sEmail.setText(user.getEmail());
                 sPhoneNumber.setText(user.getPhonenum());
-                ratingBar.setRating(Float.parseFloat(user.getRating()));
 
+                if(user.getRating() != null){
+                    ratingBar.setRating(Float.parseFloat(user.getRating()));}
                 if (user.getServicetype() != null) {
                     sService.setText(user.getServicetype()); }
                 if (user.getServiceprice() != null) {
@@ -244,7 +245,7 @@ public class Profile extends AppCompatActivity {
                     sLocation.setText(user.getLocation()); }
                 }
             catch (Exception e){
-                Log.d("User", ""+e);
+                    recreate();
                 }
 
 //            StorageReference filepath = storageReference.child("profile_picture_"+userID);

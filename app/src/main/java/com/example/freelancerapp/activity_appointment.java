@@ -63,11 +63,11 @@ public class activity_appointment extends AppCompatActivity {
         initDatePicker();
         datebutton = findViewById(R.id.setdate);
         tvDate = findViewById(R.id.tvDate);
-        tvDate.setText(getTodaysDate());
+        //tvDate.setText(getTodaysDate());
 
         timebutton = findViewById(R.id.setTime);
         tvTime = findViewById(R.id.tvTime);
-        tvTime.setText(getTodaysTime());
+        //tvTime.setText(getTodaysTime());
 
         appointbutton = findViewById(R.id.btnAppoint);
         imgProfile = findViewById(R.id.dp_appointment);
@@ -202,7 +202,7 @@ public class activity_appointment extends AppCompatActivity {
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Toast.makeText(getApplicationContext(),"Please Set Time and Date",
+                        Toast.makeText(getApplicationContext(),"Please Set the information",
                                 Toast.LENGTH_SHORT).show();
                         Log.d("User", databaseError.getMessage());
                     }
