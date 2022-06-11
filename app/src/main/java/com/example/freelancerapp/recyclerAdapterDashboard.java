@@ -4,10 +4,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
@@ -34,12 +37,19 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
         String time = userArrayList.get(position).getTime();
         String date = userArrayList.get(position).getDate();
         String payment = userArrayList.get(position).getPayment();
+        String meetup = userArrayList.get(position).getMeetup();
+        String image = userArrayList.get(position).getProfile_image_uri();
+
+
+        if(image != null){Glide.with(holder.imgClick.getContext()).load(image).into(holder.imgClick);}
 
         holder.nameTxt.setText(name);
         holder.serviceTxt.setText(service);
         holder.dateTxt.setText(date);
         holder.timeTxt.setText(time);
         holder.paymentTxt.setText(payment);
+        holder.meetTxt.setText(meetup);
+
         holder.markAsDoneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -66,8 +76,9 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
-        private TextView nameTxt, serviceTxt,timeTxt,dateTxt,paymentTxt;
+        private TextView nameTxt, serviceTxt,timeTxt,dateTxt,paymentTxt,meetTxt;
         private Button markAsDoneBtn, cancelBtn, msgBtn;
+        private ImageView imgClick;
 
         public MyViewHolder(final View view, OnNoteListenerdashboard listener){
             super(view);
@@ -75,10 +86,12 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
             serviceTxt = view.findViewById(R.id.service_dboard);
             dateTxt = view.findViewById(R.id.date_dboard);
             timeTxt = view.findViewById(R.id.time_dboard);
+            meetTxt = view.findViewById(R.id.meetup);
             paymentTxt = view.findViewById(R.id.payment);
             markAsDoneBtn = view.findViewById(R.id.btnMarkAsDone);
             cancelBtn = view.findViewById(R.id.btnCancelAppointment);
             msgBtn = view.findViewById(R.id.btnMsg);
+            imgClick = view.findViewById(R.id.imageViewDashboard);
         }
     }
 }

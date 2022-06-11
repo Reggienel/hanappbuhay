@@ -3,9 +3,12 @@ package com.example.freelancerapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,7 +27,7 @@ public class LogIn extends AppCompatActivity {
     public DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private Button button;
-    TextView textView;
+    TextView textView, txtvForgotPassword;
     EditText etEmail, etPassword;
     String  email, password;
 
@@ -61,6 +64,55 @@ public class LogIn extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 RegisterPage();
+            }
+        });
+        txtvForgotPassword = findViewById(R.id.forgot_password);
+        txtvForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { ForgorPassword();}
+
+            private void ForgorPassword() {
+                LayoutInflater factory = LayoutInflater.from(LogIn.this);
+                final View textEntryView = factory.inflate(R.layout.dialog_reset_password, null);
+
+
+                EditText editTextEmail = (EditText) textEntryView.findViewById(R.id.editTextEmail);
+
+                AlertDialog.Builder ad1 = new AlertDialog.Builder(LogIn.this);
+                ad1.setTitle("Reset Password:");
+                ad1.setIcon(android.R.drawable.ic_dialog_info);
+                ad1.setView(textEntryView);
+                ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int i) {
+                        if (!editTextEmail.getText().toString().matches("") ){
+                            FirebaseAuth.getInstance().sendPasswordResetEmail(editTextEmail.getText().toString())
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Toast.makeText(getApplicationContext(), "Email Sent",
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+                                            else{
+                                                Toast.makeText(getApplicationContext(), "Password Reset Failed",
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                        }
+                        else{
+                            //showProgressBar();
+                            Toast.makeText(getApplicationContext(), "Password Reset Failed",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int i) {
+
+                    }
+                });
+                ad1.show();// Show dialog
             }
         });
     }

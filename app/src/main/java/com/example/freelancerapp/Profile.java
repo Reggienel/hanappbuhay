@@ -1,13 +1,16 @@
 package com.example.freelancerapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,11 +19,18 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -32,9 +42,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class Profile extends AppCompatActivity {
@@ -45,8 +58,9 @@ public class Profile extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
     StorageReference storageReference;
-    TextView sName, sEmail, sPhoneNumber,sService, sAvailability, sServicePrice;
-    EditText editTextNewName,editTextNewEmail, editTextNewPassword, editTextEmail, editTextPassword,editTextServicePrice;
+    ImageView imgProfilePic;
+    TextView sName, sEmail, sPhoneNumber,sService, sAvailability, sServicePrice, sLocation;
+    EditText editTextNewName,editTextNewEmail, editTextNewPassword, editTextEmail, editTextPassword,editTextServicePrice, editTextLocation;
     String userID;
     String name;
     String email;
@@ -54,9 +68,12 @@ public class Profile extends AppCompatActivity {
     String service;
     String serviceprice;
     String strAvailability;
+    String strLocation;
     ArrayList<String> Availability = new ArrayList<String>();
     String[] itemsService, itemsDays;
     private Button button;
+    public Uri imageURI;
+    RatingBar ratingBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +94,7 @@ public class Profile extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabase = mFirebaseDatabase.getReference();
         FirebaseUser user = mAuth.getCurrentUser();
-        storageReference = FirebaseStorage.getInstance().getReference("UsersProfile/");
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         userID = user.getUid();
         sName = findViewById(R.id.full_name);
@@ -86,8 +103,11 @@ public class Profile extends AppCompatActivity {
         sService = findViewById(R.id.service);
         sAvailability = findViewById(R.id.availability);
         sServicePrice = findViewById(R.id.tvServicePrice);
+        sLocation = findViewById(R.id.txtvLocation);
+        ratingBar = findViewById(R.id.ratingBarProfile);
 
-        //imgProfilePic = findViewById(R.id.profilePic);
+
+        imgProfilePic = findViewById(R.id.imgProfilePic);
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -116,41 +136,116 @@ public class Profile extends AppCompatActivity {
 
             }
         });
-//        imgProfilePic.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent openGallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                startActivityForResult(openGallery, 1000);
-//                showProgressBar();
-//            }
-//        });
+        imgProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseProfilePic();
+            }
+        });
 
         button = (Button) findViewById(R.id.edit_butt);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Settings();
-            }}
+            }
+        }
         );
 
+        storageReference.child("images/"+userID).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(getApplicationContext()).load(uri).into(imgProfilePic);
+                mDatabase.child("users").child(userID).child("profile_image_uri").setValue(uri.toString());
+                Log.d("User", "onNull: ");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
     }
+
+    private void chooseProfilePic() {
+        Intent openGallery = new Intent();
+        openGallery.setType("image/*");
+        openGallery.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(openGallery, 1);
+        //showProgressBar();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1 && resultCode == RESULT_OK && data!= null){
+            imageURI=data.getData();
+            uploadPicture();
+        }
+
+    }
+
+    private void uploadPicture() {
+        final ProgressDialog pd = new ProgressDialog(this);
+        pd.setTitle("Uploading Image...");
+        pd.show();
+
+        StorageReference strRef = storageReference.child("images/" + userID);
+        strRef.putFile(imageURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                pd.dismiss();
+                Toast.makeText(getApplicationContext(), "Image Uploaded Successfully",
+                        Toast.LENGTH_SHORT).show();
+                recreate();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(getApplicationContext(), "Image Upload Failed",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+                 double progPercent = (100.0 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
+                 pd.setMessage("Percentage: " + (int) progPercent + "%");
+            }
+        });
+    }
+
     private void showData(DataSnapshot snapshot) {
         for (DataSnapshot ds : snapshot.getChildren()){
-            User user = new User();
-            user.setUsername(ds.child(userID).getValue(User.class).getUsername());
-            user.setEmail(ds.child(userID).getValue(User.class).getEmail());
-            user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
-            user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
-            user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
-            user.setServiceprice(ds.child(userID).getValue(User.class).getServiceprice());
+            try {
+                User user = new User();
+                user.setUsername(ds.child(userID).getValue(User.class).getUsername());
+                user.setEmail(ds.child(userID).getValue(User.class).getEmail());
+                user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
+                user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
+                user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
+                user.setServiceprice(ds.child(userID).getValue(User.class).getServiceprice());
+                user.setLocation(ds.child(userID).getValue(User.class).getLocation());
+                user.setRating(ds.child(userID).getValue(User.class).getRating());
 
-            sName.setText(user.getUsername());
-            sEmail.setText(user.getEmail());
-            sPhoneNumber.setText(user.getPhonenum());
-            sService.setText(user.getServicetype());
-            sAvailability.setText(user.getAvailability());
-            sServicePrice.setText(user.getServiceprice());
+                sName.setText(user.getUsername());
+                sEmail.setText(user.getEmail());
+                sPhoneNumber.setText(user.getPhonenum());
+                ratingBar.setRating(Float.parseFloat(user.getRating()));
 
+                if (user.getServicetype() != null) {
+                    sService.setText(user.getServicetype()); }
+                if (user.getServiceprice() != null) {
+                    sServicePrice.setText(user.getServiceprice()); }
+                if (user.getAvailability() != null) {
+                    sAvailability.setText(user.getAvailability()); }
+                if(user.getLocation() !=null){
+                    sLocation.setText(user.getLocation()); }
+                }
+            catch (Exception e){
+                Log.d("User", ""+e);
+                }
 
 //            StorageReference filepath = storageReference.child("profile_picture_"+userID);
 //            filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -416,6 +511,35 @@ public class Profile extends AppCompatActivity {
         }
     }
 
+    private void setLocation(String email, final String password) {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Get auth credentials from the user for re-authentication
+        AuthCredential credential = EmailAuthProvider.getCredential(email, password); // Current Login Credentials
+
+        // Prompt the user to re-provide their sign-in credentials
+        if (user != null) {
+            user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Log.d("value", "User re-authenticated.");
+                        //hideProgressBar();
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        updateRealData(6);
+                        Toast.makeText(getApplicationContext(), "Location Set Success",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        //hideProgressBar();
+                        Toast.makeText(getApplicationContext(), "Failed to Set Location",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+    }
+
     private void updateRealData(int i){
         mDatabase.child("users").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -427,7 +551,9 @@ public class Profile extends AppCompatActivity {
                 else if( i == 2){
                     password = editTextNewPassword.getText().toString();dataSnapshot.getRef().child("password").setValue(password);}
                 else if( i == 3){
-                    service = dropdown.getSelectedItem().toString();dataSnapshot.getRef().child("service_type").setValue(service);}
+                    service = dropdown.getSelectedItem().toString();dataSnapshot.getRef().child("service_type").setValue(service);
+                    dataSnapshot.getRef().child("date_posted").setValue(getTodaysDate());
+                    }
                 else if( i == 4){
                     StringBuffer sb = new StringBuffer();
 
@@ -441,12 +567,51 @@ public class Profile extends AppCompatActivity {
                 else if( i == 5){
                       serviceprice = editTextServicePrice.getText().toString();dataSnapshot.getRef().child("serviceprice").setValue(serviceprice+"$");
                     }
+                else if( i == 6){
+                    strLocation = editTextLocation.getText().toString();dataSnapshot.getRef().child("location").setValue(strLocation);
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.d("User", databaseError.getMessage());
             }
         });
+    }
+
+    public void dialogLocation(){
+        LayoutInflater factory = LayoutInflater.from(Profile.this);
+        final View textEntryView = factory.inflate(R.layout.dialog_location, null);
+
+        editTextLocation = (EditText) textEntryView.findViewById(R.id.editTextLocation);
+
+        editTextEmail = (EditText)textEntryView.findViewById(R.id.editTextEmail);
+        editTextPassword = (EditText)textEntryView.findViewById(R.id.editTextPassword);
+        AlertDialog.Builder ad1 = new AlertDialog.Builder(Profile.this);
+        ad1.setTitle("Set Location:");
+        ad1.setIcon(android.R.drawable.ic_dialog_info);
+        ad1.setView(textEntryView);
+        ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int i) {
+
+                Log.i("111111", editTextEmail.getText().toString());
+                Log.i("111111", editTextPassword.getText().toString());
+                if (!editTextLocation.getText().toString().matches("") || !editTextEmail.getText().toString().matches("") || !editTextPassword.getText().toString().matches("")) {
+                    setLocation(editTextEmail.getText().toString(), editTextPassword.getText().toString());
+                }
+                else{
+                    //showProgressBar();
+                    Toast.makeText(getApplicationContext(), "Failed to Set Location",
+                            Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+        ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int i) {
+
+            }
+        });
+        ad1.show();// Show dialog
     }
 
     public void dialogAvailability(){
@@ -680,7 +845,7 @@ public class Profile extends AppCompatActivity {
     }
 
     public AlertDialog Settings(){
-        String[] settings_array = new String[]{"Change Name", "Change Email", "Change Password","Service Type", "Availability"};
+        String[] settings_array = new String[]{"Change Name", "Change Email", "Change Password","Service Type", "Availability","Set Location"};
         AlertDialog.Builder builder = new AlertDialog.Builder(Profile.this);
         builder.setTitle("Account Settings")
                 .setItems(settings_array, new DialogInterface.OnClickListener() {
@@ -700,9 +865,25 @@ public class Profile extends AppCompatActivity {
                         else if (which == 4){
                             dialogAvailability();
                         }
+                        else if (which == 5){
+                            dialogLocation();
+                        }
                     }
                 });
         return builder.show();
+    }
+
+    private String getTodaysDate() {
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        month = month + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        return makeDateString(day,month,year);
+    }
+
+    private String makeDateString(int day, int month, int year) {
+        return day + "/" + month + "/" + year;
     }
 
     public void ClickMenu (View view){

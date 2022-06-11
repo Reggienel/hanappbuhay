@@ -37,7 +37,7 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ArrayList<User> userArrayList;
     private RecyclerView recyclerView;
-    String userID, serType, userid, username, userphonenum, userprice;
+    String userID, serType, userid, username, userphonenum, userprice, userlocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +87,7 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        mDatabase.orderByChild("date_posted").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot ds : snapshot.getChildren()) {
@@ -98,10 +98,6 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
                     try {
                         if (serType.matches("Plumbing")) {
                             userArrayList.add(user);
-                            username = ds.getValue(User.class).getUsername();
-                            userid = ds.getValue(User.class).getUserid();
-                            userphonenum = ds.getValue(User.class).getPhonenum();
-                            userprice = ds.getValue(User.class).getServiceprice();
                         }
                     }
                     catch (NullPointerException ignored){
@@ -173,11 +169,13 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
     @Override
     public void onItemClicked(User user) {
         Intent intentP = new Intent(this, activity_appointment.class);
-        intentP.putExtra("userid",userid);
-        intentP.putExtra("username",username);
-        intentP.putExtra("service","Plumbing");
-        intentP.putExtra("phonenum", userphonenum);
-        intentP.putExtra("serviceprice", userprice);
+        intentP.putExtra("userid", user.getUserid());
+        intentP.putExtra("username",user.getUsername());
+        intentP.putExtra("service","Cleaning");
+        intentP.putExtra("phonenum", user.getPhonenum());
+        intentP.putExtra("serviceprice", user.getServiceprice());
+        intentP.putExtra("location", user.getLocation());
+        intentP.putExtra("profile_image_uri", user.getProfile_image_uri());
         finish();
         startActivity(intentP);
     }

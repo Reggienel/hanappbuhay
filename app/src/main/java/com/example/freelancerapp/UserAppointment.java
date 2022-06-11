@@ -9,20 +9,12 @@ public class UserAppointment {
     public String payment;
     public String phonenum;
     public String serviceprice;
-//    public String availability;
-//    public String appointment;
+    public String meetup;
+    public String profile_image_uri;
 
     public UserAppointment() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
-
-//    public UserAppointment(String userid, String username, String email, String phonenum, String password) {
-//        this.userid = userid;
-//        this.username = username;
-//        this.email = email;
-//        this.phonenum = phonenum;
-//        this.password = password;
-//    }
 
     public String getId() {
         return id;
@@ -65,13 +57,13 @@ public class UserAppointment {
     public String getServiceprice() { return serviceprice; }
 
     public void setServiceprice(String serviceprice) { this.serviceprice = serviceprice; }
-//
-//    public String getAvailability() { return availability; }
-//
-//    public void setAvailabity(String availability) { this.availability = availability; }
 
-//    public String getAppointment() { return appointment; }
-//
-//    public void setAppointment(String appointment) { this.appointment = appointment; }
+    public String getMeetup() { return meetup; }
+
+    public void setMeetup(String meetup) { this.meetup = meetup; }
+
+    public String getProfile_image_uri() { return profile_image_uri; }
+
+    public void setProfile_image_uri(String profile_image_uri) { this.profile_image_uri = profile_image_uri; }
 }
 

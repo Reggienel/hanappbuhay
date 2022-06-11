@@ -16,15 +16,25 @@
         <include layout="@layout/main_toolbar" />
 
         <ImageView
-            android:id="@+id/imageView4"
+            android:id="@+id/imgProfilePic"
             android:layout_width="171dp"
             android:layout_height="192dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="16dp"
             android:background="@null"
             android:clickable="true"
             app:srcCompat="@drawable/person" />
+
+        <RatingBar
+            android:id="@+id/ratingBarProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"
+            android:numStars="5"
+            android:stepSize="0.5"
+            android:progressTint="#FF1493"/>
 
         <TextView
             android:id="@+id/full_name"
@@ -33,6 +43,7 @@
             android:layout_gravity="center"
             android:foregroundGravity="center"
             android:text="JUAN DELA CRUZ"
+            android:textAllCaps = "true"
             android:textColor="#FF1493"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -57,11 +68,12 @@
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/location"
+                    android:id="@+id/txtvLocation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="ANGELES CITY"
+                    android:text="N/A"
+                    android:textAllCaps = "true"
                     android:textColor="#FF1493"
                     android:textSize="18sp" />
             </TableRow>

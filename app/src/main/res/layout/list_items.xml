@@ -27,13 +27,13 @@
                 <TableRow
                     android:layout_width="308dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:layout_marginBottom="10dp">
 
                     <ImageView
                         android:id="@+id/dp_clean_1"
                         android:layout_width="177dp"
                         android:layout_height="187dp"
-                        android:layout_marginBottom="-20dp"
                         android:clickable="true"
                         android:focusable="true"
                         app:srcCompat="@drawable/person" />
@@ -54,6 +54,7 @@
                         android:focusable="true"
                         android:gravity="center"
                         android:text="NAME OF CLEANER"
+                        android:textAllCaps = "true"
                         android:textColor="@color/white"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -65,18 +66,37 @@
                     android:background="#FFC0CB">
 
                     <TextView
-                        android:id="@+id/location"
+                        android:id="@+id/rlocation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
                         android:text="LOCATION"
+                        android:textAllCaps = "true"
                         android:textColor="#339933"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
                 </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:background="#FF03DAC5">
+
+                    <RatingBar
+                        android:id="@+id/ratingBarList1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:isIndicator="true"
+                        android:numStars="5"
+                        android:progressTint="#FF1493"
+                        android:stepSize="0.5" />
+
+                </TableRow>
+
             </TableLayout>
         </ScrollView>
     </LinearLayout>

@@ -1,5 +1,7 @@
 package com.example.freelancerapp;
 
+import java.net.URI;
+
 public class User {
     public String userid;
     public String username;
@@ -9,6 +11,10 @@ public class User {
     public String service_type;
     public String availability;
     public String serviceprice;
+    public String location;
+    public String profile_image_uri;
+    public String date_posted;
+    public String rating;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -73,5 +79,21 @@ public class User {
     public String getServiceprice() { return serviceprice; }
 
     public void setServiceprice(String serviceprice) { this.serviceprice = serviceprice; }
+
+    public String getLocation() { return location; }
+
+    public void setLocation(String location) { this.location = location; }
+
+    public String getProfile_image_uri() { return profile_image_uri; }
+
+    public void setProfile_image_uri(String profile_image_uri) { this.profile_image_uri = profile_image_uri; }
+
+    public String getDate_posted() { return date_posted; }
+
+    public void setDate_posted(String date_posted) { this.date_posted = date_posted; }
+
+    public String getRating() { return rating; }
+
+    public void setRating(String rating) { this.rating = rating; }
 }
 
