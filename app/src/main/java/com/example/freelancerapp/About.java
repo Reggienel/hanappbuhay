@@ -77,7 +77,6 @@ public class About extends AppCompatActivity {
     }
     public void ClickProfile(View view){
         //redirect activity to settings
-        finish();
         NavDrawer.redirectActivity(this, Profile.class);
     }
     public void ClickLogout(View view){

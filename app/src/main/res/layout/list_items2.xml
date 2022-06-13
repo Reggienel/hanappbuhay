@@ -57,7 +57,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="Cleaning"
+                        android:text="Service"
                         android:textColor="#339933"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -73,7 +73,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="June 6, 2006"
+                        android:text="Date"
                         android:textColor="#339933"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -89,7 +89,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="6:00pm"
+                        android:text="Time"
                         android:textColor="#339933"
                         android:textSize="16sp"
                         android:textStyle="bold" />

@@ -171,13 +171,13 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
         Intent intentP = new Intent(this, activity_appointment.class);
         intentP.putExtra("userid", user.getUserid());
         intentP.putExtra("username",user.getUsername());
-        intentP.putExtra("service","Cleaning");
+        intentP.putExtra("service","Plumbing");
         intentP.putExtra("phonenum", user.getPhonenum());
         intentP.putExtra("serviceprice", user.getServiceprice());
         intentP.putExtra("location", user.getLocation());
         intentP.putExtra("profile_image_uri", user.getProfile_image_uri());
-        finish();
         startActivity(intentP);
+        finish();
     }
 }
 

@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +43,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -204,14 +206,14 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
         NavDrawer.closeDrawer(drawerLayout);
     }
 
-    public void checkOut(UserAppointment userAppointment){
-        Intent intentCheckOut = new Intent(this, CheckoutActivityJava.class);
-        intentCheckOut.putExtra("aId",userAppointment.getId());
-        intentCheckOut.putExtra("serviceprice",userAppointment.getServiceprice());
-        Log.d("TAG", "onItemClicked: "+userAppointment.getId());
-        finish();
-        startActivity(intentCheckOut);
-    }
+//    public void checkOut(UserAppointment userAppointment){
+//        Intent intentCheckOut = new Intent(this, CheckoutActivityJava.class);
+//        intentCheckOut.putExtra("aId",userAppointment.getId());
+//        intentCheckOut.putExtra("serviceprice",userAppointment.getServiceprice());
+//        Log.d("TAG", "onItemClicked: "+userAppointment.getId());
+//        finish();
+//        startActivity(intentCheckOut);
+//    }
 
     @Override
     public void onItemClicked(UserAppointment userAppointment) {
@@ -285,16 +287,17 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
                                                         double finalRate = totalarr / arr.size();
 
                                                         mDatabase.child("users").child(userAppointment.getId()).child("rating").setValue(String.valueOf(finalRate));
+                                                        mDatabase.child("users").child(userAppointment.getId()).child("userratingcount").setValue(String.valueOf(arr.size()));
 
                                                         Intent intentCheckOut = new Intent(getApplicationContext(), CheckoutActivityJava.class);
                                                         intentCheckOut.putExtra("aId",userAppointment.getId());
                                                         intentCheckOut.putExtra("serviceprice",userAppointment.getServiceprice());
-
-                                                        Log.d("TAG", "onItemClicked: "+userAppointment.getId());
-                                                        finish();
                                                         startActivity(intentCheckOut);
+                                                        finish();
+                                                        Log.d("TAG", "onItemClicked: "+userAppointment.getId());
                                                         Log.d(TAG, Arrays.toString(new List[]{arr}));
                                                         Log.d(TAG, "Total " + finalRate);
+                                                        Log.d(TAG, "Total " + arr.size());
                                                     }
                                                     else {
                                                         Log.w(TAG, "Error getting documents.", task.getException());
@@ -324,127 +327,148 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
             ad1.show();// Show dialog
         }
         else{
-                AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
-                ad1.setTitle("Confirmation:");
-                ad1.setIcon(android.R.drawable.ic_dialog_info);
-                ad1.setMessage("Are you sure the appointment with " + userAppointment.getName() + " on " + userAppointment.getDate() + " at " + userAppointment.getTime() + " is Done");
-                ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int i) {
-                        mDatabase.child("bookings").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
-                                dataSnapshot.getRef().child(userID).child(aId).removeValue();
-                                Toast.makeText(getApplicationContext(), "Appointment Finished",
-                                        Toast.LENGTH_SHORT).show();
-                                recreate();
-                            }
+                if(!userAppointment.getPayment().equals("Not Paid")){
+                    AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
+                    ad1.setTitle("Confirmation:");
+                    ad1.setIcon(android.R.drawable.ic_dialog_info);
+                    ad1.setMessage("Are you sure the appointment with " + userAppointment.getName() + " on " + userAppointment.getDate() + " at " + userAppointment.getTime() + " is Done");
+                    ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
+                            mDatabase.child("bookings").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
+                                    dataSnapshot.getRef().child(userID).child(aId).removeValue();
+                                    Toast.makeText(getApplicationContext(), "Appointment Finished",
+                                            Toast.LENGTH_SHORT).show();
+                                    recreate();
+                                }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
 
-                            }
-                        });
+                                }
+                            });
 
-                    }
-                });
+                        }
+                    });
 
-                ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int i) {
+                    ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
 
-                    }
-                });
-                ad1.show();// Show dialog
+                        }
+                    });
+                    ad1.show();// Show dialog
+                }
+              else{
+                    Toast.makeText(getApplicationContext(), "Appointment Not Paid",
+                            Toast.LENGTH_SHORT).show();
+                }
         }
+    }
+
+    private String getTodaysDate() {
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        month = month + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        return day + "/" + month + "/" + year;
     }
 
 
     @Override
     public void onItemClickedCancel(UserAppointment userAppointment) {
-        if(userAppointment.getName().startsWith("Employee")) {
-            mDatabase.child("bookings").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
-                    ad1.setTitle("Confirmation:");
-                    ad1.setIcon(android.R.drawable.ic_dialog_info);
-                    ad1.setMessage("Are you sure you want to cancel your appointment with " + userAppointment.getName() + " on " + userAppointment.getDate() + " at " + userAppointment.getTime() + " ?");
-                    ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int i) {
+        if(userAppointment.getDate() == getTodaysDate() ){
+            if(userAppointment.getName().startsWith("Employee")) {
+                mDatabase.child("bookings").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
+                        ad1.setTitle("Confirmation:");
+                        ad1.setIcon(android.R.drawable.ic_dialog_info);
+                        ad1.setMessage("Are you sure you want to cancel your appointment with " + userAppointment.getName() + " on " + userAppointment.getDate() + " at " + userAppointment.getTime() + " ?");
+                        ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
 
-                            dataSnapshot.getRef().child(userID).child(userAppointment.getId()).removeValue();
-                            Toast.makeText(getApplicationContext(), "Appointment Cancelled",
-                                    Toast.LENGTH_SHORT).show();
+                                dataSnapshot.getRef().child(userID).child(userAppointment.getId()).removeValue();
+                                Toast.makeText(getApplicationContext(), "Appointment Cancelled",
+                                        Toast.LENGTH_SHORT).show();
 
-                            Log.d("User", "userAppointment.getId()" + userAppointment.getId());
+                                Log.d("User", "userAppointment.getId()" + userAppointment.getId());
 
-                            dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
-                            Toast.makeText(getApplicationContext(), "Employee Notified",
-                                    Toast.LENGTH_SHORT).show();
+                                dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
+                                Toast.makeText(getApplicationContext(), "Employee Notified",
+                                        Toast.LENGTH_SHORT).show();
 
-//                            Intent starterIntent = new Intent(Dashboard.this, NavDrawer.class);
-//                            finish();
-//                            startActivity(starterIntent);
-                            recreate();
-                        }
-                    });
+    //                            Intent starterIntent = new Intent(Dashboard.this, NavDrawer.class);
+    //                            finish();
+    //                            startActivity(starterIntent);
+                                recreate();
+                            }
+                        });
 
-                    ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int i) {
+                        ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
 
-                        }
-                    });
-                    ad1.show();// Show dialog
+                            }
+                        });
+                        ad1.show();// Show dialog
 
-                }
+                    }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.d("User", databaseError.getMessage());
-                }
-            });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d("User", databaseError.getMessage());
+                    }
+                });
+            }
+            else{
+                mDatabase.child("bookings").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
+                        ad1.setTitle("Confirmation:");
+                        ad1.setIcon(android.R.drawable.ic_dialog_info);
+                        ad1.setMessage("Are you sure you want to cancel your appointment with " + aName + " on " + aDate + " at " + aTime + " ?");
+                        ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+
+                                dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
+                                Toast.makeText(getApplicationContext(), "Appointment Cancelled",
+                                        Toast.LENGTH_SHORT).show();
+
+                                dataSnapshot.getRef().child(userID).child(aId).removeValue();
+                                Toast.makeText(getApplicationContext(), "Employer Notified",
+                                        Toast.LENGTH_SHORT).show();
+
+    //                            Intent starterIntent = new Intent(Dashboard.this, NavDrawer.class);
+    //                            finish();
+    //                            startActivity(starterIntent);
+                                recreate();
+
+                            }
+                        });
+
+                        ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+
+                            }
+                        });
+                        ad1.show();// Show dialog
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d("User", databaseError.getMessage());
+                    }
+                });
+            }
         }
         else{
-            mDatabase.child("bookings").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
-                    ad1.setTitle("Confirmation:");
-                    ad1.setIcon(android.R.drawable.ic_dialog_info);
-                    ad1.setMessage("Are you sure you want to cancel your appointment with " + aName + " on " + aDate + " at " + aTime + " ?");
-                    ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int i) {
-
-                            dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
-                            Toast.makeText(getApplicationContext(), "Appointment Cancelled",
-                                    Toast.LENGTH_SHORT).show();
-
-                            dataSnapshot.getRef().child(userID).child(aId).removeValue();
-                            Toast.makeText(getApplicationContext(), "Employer Notified",
-                                    Toast.LENGTH_SHORT).show();
-
-//                            Intent starterIntent = new Intent(Dashboard.this, NavDrawer.class);
-//                            finish();
-//                            startActivity(starterIntent);
-                            recreate();
-
-                        }
-                    });
-
-                    ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int i) {
-
-                        }
-                    });
-                    ad1.show();// Show dialog
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.d("User", databaseError.getMessage());
-                }
-            });
+            Toast.makeText(getApplicationContext(),  "Cannot Cancel on Appointment Day",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -454,17 +478,6 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
         Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
         startActivity(intent);
     }
-
-//    public  double sum() {
-//        double sum = 0; // initialize sum
-//        int i;
-//
-//        // Iterate through all elements and add them to sum
-//        for (i = 0; i < arr.size(); i++)
-//            sum += arr[i];
-//
-//        return sum;
-//    }
 
     public void ratingDialog(UserAppointment userAppointment){
         LayoutInflater factory = LayoutInflater.from(Dashboard.this);
@@ -536,7 +549,7 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
                                                     double finalRate = totalarr / arr.size();
 
                                                     mDatabase.child("users").child(userAppointment.getId()).child("rating").setValue(String.valueOf(finalRate));
-
+                                                    mDatabase.child("users").child(userAppointment.getId()).child("userratingcount").setValue(String.valueOf(arr.size()));
                                                     Log.d(TAG, Arrays.toString(new List[]{arr}));
                                                     Log.d(TAG, "Total " + finalRate);
                                                 }

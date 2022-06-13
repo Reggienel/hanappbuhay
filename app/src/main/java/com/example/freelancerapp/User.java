@@ -15,6 +15,7 @@ public class User {
     public String profile_image_uri;
     public String date_posted;
     public String rating;
+    public String userratingcount;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -95,5 +96,9 @@ public class User {
     public String getRating() { return rating; }
 
     public void setRating(String rating) { this.rating = rating; }
+
+    public String getUserratingcount() { return  userratingcount; }
+
+    public void setUserratingcount(String userratingcount) { this. userratingcount =  userratingcount; }
 }
 

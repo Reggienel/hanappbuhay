@@ -1,5 +1,6 @@
 package com.example.freelancerapp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -57,13 +58,14 @@ public class CheckoutActivityJava extends AppCompatActivity {
     private Stripe stripe;
     private TextView amountTextView;
 
-    public DatabaseReference mDatabase;
+    public  static DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseUser fUser;
 
-    private String aId, serprice;
-    private String userID, userPaymentPrice;
+    private static String aId, serprice;
+    private static String userID;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,7 +99,7 @@ public class CheckoutActivityJava extends AppCompatActivity {
                 serprice = extras.getString("serviceprice");
                 amountTextView.setText(serprice);
                 Log.d("aId",aId);
-                Log.d("aId",serprice.replace("$",""));
+                Log.d("aId",serprice.replace("PHP",""));
             }
         } else {
             aId = (String) savedInstanceState.getSerializable("aId");
@@ -105,56 +107,25 @@ public class CheckoutActivityJava extends AppCompatActivity {
             amountTextView.setText(serprice);
         }
 
-        mAuth = FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        FirebaseUser fUser = mAuth.getCurrentUser();
-        userID = fUser.getUid();
-        mDatabase = mFirebaseDatabase.getReference();
-
-
         // Configure the SDK with your Stripe publishable key so it can make requests to Stripe
         stripe = new Stripe(
                 getApplicationContext(),
                 Objects.requireNonNull("pk_test_51L85Z1DBo3wrAMKB7RAgXHVre1no0Xzyz5DZCW18EA3kVJAMEzexIQYzj2bRjL43kaVWbHOpSkGBfC7zcqIHzF5g00CP4XyJcT")
         );
-        startCheckout();
-//        userPaymentPrice = ds.getValue(User.class).getServiceprice();
-//        Log.d("TAG", "showData: "+ userPaymentPrice);
-//        amountTextView.setText(userPaymentPrice);
-    }
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        fUser = mAuth.getCurrentUser();
+        userID = fUser.getUid();
+        mDatabase = mFirebaseDatabase.getReference();
 
-    private void updatePayment() {
-        mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                dataSnapshot.getRef().child(aId).child("payment").setValue(serprice);
-                mDatabase.child("bookings").child(aId).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        dataSnapshot.getRef().child(userID).child("payment").setValue(serprice);
-                        Toast.makeText(getApplicationContext(),  "updatePayment",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Toast.makeText(getApplicationContext(),"updatePaymentFailed",
-                                Toast.LENGTH_SHORT).show();
-                        Log.d("payment", databaseError.getMessage());
-                    }
-                });
-            }
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(),"updatePaymentFailed",
-                        Toast.LENGTH_SHORT).show();
-                Log.d("payment", databaseError.getMessage());
-            }
-        });
+        startCheckout();
     }
 
     private void startCheckout() {
         // Create a PaymentIntent by calling the server's endpoint.
         MediaType mediaType = MediaType.get("application/json; charset=utf-8");
 
-        double amount = Double.valueOf(serprice.replace("$","")) * 100;
+        double amount = Double.valueOf(serprice.replace("PHP",""));
 
         Map<String, Object> payMap = new HashMap<>();
         Map<String, Object> itemMap = new HashMap<>();
@@ -193,12 +164,25 @@ public class CheckoutActivityJava extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message);
-        builder.setPositiveButton("Ok", null);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(title.matches("Payment completed")){
+                        Toast.makeText(getApplicationContext(), title,
+                            Toast.LENGTH_SHORT).show();
+
+                        Intent intentDash = new Intent(CheckoutActivityJava.this, Dashboard.class);
+                        startActivity(intentDash);
+                        finish();
+                }
+                else{
+                        Toast.makeText(getApplicationContext(), title,
+                            Toast.LENGTH_SHORT).show();
+                    Log.d("payment", "Dialog Alert displayAlert"+title);
+                }
+            }
+        });
         builder.create().show();
-        updatePayment();
-        Intent intentDash = new Intent(this, Dashboard.class);
-        finish();
-        startActivity(intentDash);
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -271,12 +255,17 @@ public class CheckoutActivityJava extends AppCompatActivity {
                         "Payment completed",
                         gson.toJson(paymentIntent)
                 );
+                mDatabase.child("bookings").child(userID).child(aId).child("payment").setValue(serprice);
+                mDatabase.child("bookings").child(aId).child(userID).child("payment").setValue(serprice);
+
+                Log.d("payment", "Dialog Alert SuccessPaymentResultCallback");
             } else if (status == PaymentIntent.Status.RequiresPaymentMethod) {
                 // Payment failed – allow retrying using a different payment method
                 activity.displayAlert(
                         "Payment failed",
                         Objects.requireNonNull(paymentIntent.getLastPaymentError()).getMessage()
                 );
+                Log.d("payment", "Dialog Alert FailedPaymentResultCallback");
             }
         }
         @Override

@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 
 public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapterDashboard.MyViewHolder> {
     private ArrayList<UserAppointment> userArrayList = new ArrayList<>();
-    private OnNoteListenerdashboard listenerdb;
+    private final OnNoteListenerdashboard listenerdb;
 
     public recyclerAdapterDashboard(ArrayList<UserAppointment> userArrayList, OnNoteListenerdashboard listenerdb){
         this.userArrayList = userArrayList;
@@ -53,7 +54,14 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
         holder.markAsDoneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listenerdb.onItemClicked(userArrayList.get(holder.getAdapterPosition()));
+                if(name.startsWith("Employee")){
+                    if(payment.equals("Not Paid")){listenerdb.onItemClicked(userArrayList.get(holder.getAdapterPosition()));}
+                    else{ Toast.makeText(view.getContext(), "Already Paid",
+                                Toast.LENGTH_SHORT).show();}
+                }
+                else{
+                    listenerdb.onItemClicked(userArrayList.get(holder.getAdapterPosition()));
+                }
             }
         });
         holder.cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -75,10 +83,10 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
         return userArrayList.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
-        private TextView nameTxt, serviceTxt,timeTxt,dateTxt,paymentTxt,meetTxt;
-        private Button markAsDoneBtn, cancelBtn, msgBtn;
-        private ImageView imgClick;
+    public static class MyViewHolder extends RecyclerView.ViewHolder{
+        private final TextView nameTxt, serviceTxt,timeTxt,dateTxt,paymentTxt,meetTxt;
+        private final Button markAsDoneBtn, cancelBtn, msgBtn;
+        private final ImageView imgClick;
 
         public MyViewHolder(final View view, OnNoteListenerdashboard listener){
             super(view);

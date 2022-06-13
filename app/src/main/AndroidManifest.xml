@@ -11,6 +11,7 @@
         android:theme="@style/Theme.FreelancerApp">
         <activity
             android:name=".CheckoutActivityJava"
+            android:launchMode='singleTask'
             android:exported="false" />
         <activity
             android:name=".activity_appointment"

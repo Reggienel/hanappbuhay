@@ -40,7 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="text|number"
-        android:hint="10USD"
+        android:hint="PHP"
         android:textSize="18sp"/>
 
     <TextView

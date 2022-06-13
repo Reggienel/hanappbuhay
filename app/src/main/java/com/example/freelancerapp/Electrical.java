@@ -168,13 +168,13 @@ public class Electrical extends AppCompatActivity implements OnNoteListener{
         Intent intentE = new Intent(this, activity_appointment.class);
         intentE.putExtra("userid", user.getUserid());
         intentE.putExtra("username",user.getUsername());
-        intentE.putExtra("service","Cleaning");
+        intentE.putExtra("service","Electrical");
         intentE.putExtra("phonenum", user.getPhonenum());
         intentE.putExtra("serviceprice", user.getServiceprice());
         intentE.putExtra("location", user.getLocation());
         intentE.putExtra("profile_image_uri", user.getProfile_image_uri());
-        finish();
         startActivity(intentE);
+        finish();
     }
 }
 

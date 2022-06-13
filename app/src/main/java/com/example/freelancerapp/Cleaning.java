@@ -185,8 +185,8 @@ public class Cleaning extends AppCompatActivity implements OnNoteListener{
         intentC.putExtra("serviceprice", user.getServiceprice());
         intentC.putExtra("location", user.getLocation());
         intentC.putExtra("profile_image_uri", user.getProfile_image_uri());
-        finish();
         startActivity(intentC);
+        finish();
     }
 
 }

@@ -169,13 +169,13 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
         Intent intentL = new Intent(this, activity_appointment.class);
         intentL.putExtra("userid", user.getUserid());
         intentL.putExtra("username",user.getUsername());
-        intentL.putExtra("service","Cleaning");
+        intentL.putExtra("service","Laundry");
         intentL.putExtra("phonenum", user.getPhonenum());
         intentL.putExtra("serviceprice", user.getServiceprice());
         intentL.putExtra("location", user.getLocation());
         intentL.putExtra("profile_image_uri", user.getProfile_image_uri());
-        finish();
         startActivity(intentL);
+        finish();
     }
 }
 

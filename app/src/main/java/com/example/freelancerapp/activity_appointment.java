@@ -51,7 +51,7 @@ public class activity_appointment extends AppCompatActivity {
     FirebaseUser fUser;
     public String newUserName;
     String selectedDate, selectedTime, meetUp, newUserID, newService, newPhoneNum, newPrice, newLocation, newImageUri;
-    String userID, username, userphonenum, userImageUri;
+    String userID, username, userphonenum, userImageUri, cTime, cDate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,6 +145,7 @@ public class activity_appointment extends AppCompatActivity {
                     username = user.getUsername();
                     userphonenum = user.getPhonenum();
                     userImageUri = user.getProfile_image_uri();
+                Log.d("user", "checking: "+username);
             }
 
             @Override
@@ -159,47 +160,74 @@ public class activity_appointment extends AppCompatActivity {
                 appointDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (selectedDate != null && selectedTime != null && meetUp != null){
-                        AlertDialog.Builder ad1 = new AlertDialog.Builder(activity_appointment.this);
-                        ad1.setTitle("Confirmation:");
-                        ad1.setIcon(android.R.drawable.ic_dialog_info);
-                        ad1.setMessage("Are you sure you want to set an appointment with " + newUserName + " on " + selectedDate + " at " + selectedTime +" ?");
-                        ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
+                        appointDatabase.child("bookings").child(newUserID).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot ds : snapshot.getChildren()) {
+                                    UserAppointment userA = new  UserAppointment();
+                                    String date = ds.getValue(UserAppointment.class).getDate();
+                                    String time = ds.getValue(UserAppointment.class).getTime();
+                                    try {
+                                        if (date.matches(selectedDate)&&time.matches(selectedTime)) {
+                                            Toast.makeText(getApplicationContext(),  "Date and Time Not Available",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                        else{
+                                            if (selectedDate != null && selectedTime != null && meetUp != null){
+                                                AlertDialog.Builder ad1 = new AlertDialog.Builder(activity_appointment.this);
+                                                ad1.setTitle("Confirmation:");
+                                                ad1.setIcon(android.R.drawable.ic_dialog_info);
+                                                ad1.setMessage("Are you sure you want to set an appointment with " + newUserName + " on " + selectedDate + " at " + selectedTime +" ?");
+                                                ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int i) {
 
-                                    dataSnapshot.getRef().child(newUserID).child("id").setValue(newUserID);
-                                    dataSnapshot.getRef().child(newUserID).child("name").setValue("Employee: "+newUserName);
-                                    dataSnapshot.getRef().child(newUserID).child("service").setValue(newService);
-                                    dataSnapshot.getRef().child(newUserID).child("date").setValue(selectedDate);
-                                    dataSnapshot.getRef().child(newUserID).child("time").setValue(selectedTime);
-                                    dataSnapshot.getRef().child(newUserID).child("payment").setValue("Not Paid");
-                                    dataSnapshot.getRef().child(newUserID).child("phonenum").setValue(newPhoneNum);
-                                    dataSnapshot.getRef().child(newUserID).child("serviceprice").setValue(newPrice);
-                                    dataSnapshot.getRef().child(newUserID).child("meetup").setValue(meetUp);
-                                    dataSnapshot.getRef().child(newUserID).child("profile_image_uri").setValue(newImageUri);
+                                                        dataSnapshot.getRef().child(newUserID).child("id").setValue(newUserID);
+                                                        dataSnapshot.getRef().child(newUserID).child("name").setValue("Employee: "+newUserName);
+                                                        dataSnapshot.getRef().child(newUserID).child("service").setValue(newService);
+                                                        dataSnapshot.getRef().child(newUserID).child("date").setValue(selectedDate);
+                                                        dataSnapshot.getRef().child(newUserID).child("time").setValue(selectedTime);
+                                                        dataSnapshot.getRef().child(newUserID).child("payment").setValue("Not Paid");
+                                                        dataSnapshot.getRef().child(newUserID).child("phonenum").setValue(newPhoneNum);
+                                                        dataSnapshot.getRef().child(newUserID).child("serviceprice").setValue(newPrice);
+                                                        dataSnapshot.getRef().child(newUserID).child("meetup").setValue(meetUp);
+                                                        dataSnapshot.getRef().child(newUserID).child("profile_image_uri").setValue(newImageUri);
 
-                                    notifyEmployee();
-                                    Toast.makeText(getApplicationContext(),"Appointment Save",
-                                            Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(activity_appointment.this, Dashboard.class);
-                                    finish();
-                                    recreate();
-                                    startActivity(intent);
+                                                        notifyEmployee();
+                                                        Toast.makeText(getApplicationContext(),"Appointment Save",
+                                                                Toast.LENGTH_SHORT).show();
+                                                        Intent intent = new Intent(activity_appointment.this, Dashboard.class);
+                                                        finish();
+                                                        recreate();
+                                                        startActivity(intent);
+
+                                                    }
+                                                });
+                                                ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int i) {
+
+                                                    }
+                                                });
+                                                ad1.show();// Show dialog
+                                            }
+                                            else{
+                                                Toast.makeText(getApplicationContext(),"Please Set the information",
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }
+                                    catch (NullPointerException ignored){
+                                    }
+
+
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
 
                             }
                         });
-                            ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int i) {
-
-                                }
-                            });
-                            ad1.show();// Show dialog
-                        }
-                        else{
-                            Toast.makeText(getApplicationContext(),"Please Set the information",
-                                    Toast.LENGTH_SHORT).show();
-                        }
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Toast.makeText(getApplicationContext(),"Please Set the information",
@@ -208,7 +236,10 @@ public class activity_appointment extends AppCompatActivity {
                     }
                 });
             }
+
         });
+
+
         chatbutton = findViewById(R.id.chat_btn);
         chatbutton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -221,10 +252,15 @@ public class activity_appointment extends AppCompatActivity {
         });
     }
 
+    public void notification(){
+
+    }
+
     private void notifyEmployee() {
         appointDatabase.child("bookings").child(newUserID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 dataSnapshot.getRef().child(userID).child("id").setValue(userID);
                 dataSnapshot.getRef().child(userID).child("name").setValue("Employer: "+username);
                 dataSnapshot.getRef().child(userID).child("service").setValue(newService);

@@ -46,8 +46,15 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 
 public class Profile extends AppCompatActivity {
@@ -127,7 +134,50 @@ public class Profile extends AppCompatActivity {
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                showData(snapshot);
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    try {
+                        User user = new User();
+                        user.setUsername(ds.child(userID).getValue(User.class).getUsername());
+                        user.setEmail(ds.child(userID).getValue(User.class).getEmail());
+                        user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
+                        user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
+                        user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
+                        user.setServiceprice(ds.child(userID).getValue(User.class).getServiceprice());
+                        user.setLocation(ds.child(userID).getValue(User.class).getLocation());
+                        user.setRating(ds.child(userID).getValue(User.class).getRating());
+
+                        sEmail.setText(user.getEmail());
+                        sPhoneNumber.setText(user.getPhonenum());
+                        sName.setText(user.getUsername());
+                        if(user.getRating() != null){
+                            ratingBar.setRating(Float.parseFloat(user.getRating()));}
+                        if (user.getServicetype() != null) {
+                            sService.setText(user.getServicetype()); }
+                        if (user.getServiceprice() != null) {
+                            sServicePrice.setText(user.getServiceprice()); }
+                        if (user.getAvailability() != null) {
+                            sAvailability.setText(user.getAvailability()); }
+                        if(user.getLocation() !=null){
+                            sLocation.setText(user.getLocation()); }
+                    }
+                    catch (Exception e){
+                        Log.d("Profile", "showData: "+ e.getMessage());
+                    }
+
+
+//            StorageReference filepath = storageReference.child("profile_picture_"+userID);
+//            filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                @Override
+//                public void onSuccess(Uri uri) {
+//                    Picasso.get().load(uri).into(imgProfilePic);
+//                }
+//            }).addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception exception) {
+//                    Log.d("View Profile", "No Upload Profile");
+//                }
+//            });
+                }
 
             }
 
@@ -214,53 +264,6 @@ public class Profile extends AppCompatActivity {
                  pd.setMessage("Percentage: " + (int) progPercent + "%");
             }
         });
-    }
-
-    private void showData(DataSnapshot snapshot) {
-        for (DataSnapshot ds : snapshot.getChildren()){
-
-                User user = new User();
-                user.setUsername(ds.child(userID).getValue(User.class).getUsername());
-                user.setEmail(ds.child(userID).getValue(User.class).getEmail());
-                user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
-                user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
-                user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
-                user.setServiceprice(ds.child(userID).getValue(User.class).getServiceprice());
-                user.setLocation(ds.child(userID).getValue(User.class).getLocation());
-                user.setRating(ds.child(userID).getValue(User.class).getRating());
-             try {
-                sName.setText(user.getUsername());
-                sEmail.setText(user.getEmail());
-                sPhoneNumber.setText(user.getPhonenum());
-
-                if(user.getRating() != null){
-                    ratingBar.setRating(Float.parseFloat(user.getRating()));}
-                if (user.getServicetype() != null) {
-                    sService.setText(user.getServicetype()); }
-                if (user.getServiceprice() != null) {
-                    sServicePrice.setText(user.getServiceprice()); }
-                if (user.getAvailability() != null) {
-                    sAvailability.setText(user.getAvailability()); }
-                if(user.getLocation() !=null){
-                    sLocation.setText(user.getLocation()); }
-                }
-            catch (Exception e){
-                    recreate();
-                }
-
-//            StorageReference filepath = storageReference.child("profile_picture_"+userID);
-//            filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                @Override
-//                public void onSuccess(Uri uri) {
-//                    Picasso.get().load(uri).into(imgProfilePic);
-//                }
-//            }).addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception exception) {
-//                    Log.d("View Profile", "No Upload Profile");
-//                }
-//            });
-        }
     }
 
     private void changename(String email, final String password) {
@@ -563,10 +566,12 @@ public class Profile extends AppCompatActivity {
                         sb.append(", ");
                     }
                     strAvailability = sb.toString();
-                    Log.d("User", strAvailability);
+                    Log.d("User", "Str "+strAvailability);
+                    Log.d("User", "Avail "+Availability.toString());
+                    dataSnapshot.getRef().child("availability").removeValue();
                     dataSnapshot.getRef().child("availability").setValue(strAvailability);}
                 else if( i == 5){
-                      serviceprice = editTextServicePrice.getText().toString();dataSnapshot.getRef().child("serviceprice").setValue(serviceprice+"$");
+                      serviceprice = editTextServicePrice.getText().toString();dataSnapshot.getRef().child("serviceprice").setValue(serviceprice+"PHP");
                     }
                 else if( i == 6){
                     strLocation = editTextLocation.getText().toString();dataSnapshot.getRef().child("location").setValue(strLocation);
@@ -624,6 +629,7 @@ public class Profile extends AppCompatActivity {
 
         editTextEmail = (EditText)textEntryView.findViewById(R.id.editTextEmail);
         editTextPassword = (EditText)textEntryView.findViewById(R.id.editTextPassword);
+        Availability.clear();
         AlertDialog.Builder ad1 = new AlertDialog.Builder(Profile.this);
         ad1.setTitle("Availability:");
         ad1.setIcon(android.R.drawable.ic_dialog_info);
@@ -631,38 +637,44 @@ public class Profile extends AppCompatActivity {
         ad1.setMultiChoiceItems(itemsDays, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                switch (which) {
-                    case 0:
-                        if(isChecked)
-                            Toast.makeText(getApplicationContext(), "Clicked on 0", Toast.LENGTH_LONG).show();
-                        Availability.add("Monday");
-                        break;
-                    case 1:
-                        if(isChecked)
-                            Toast.makeText(getApplicationContext(), "Clicked on 1", Toast.LENGTH_LONG).show();
-                        Availability.add("Tuesday");
-                        break;
-                    case 2:
-                        if(isChecked)
-                            Toast.makeText(getApplicationContext(), "Clicked on 2", Toast.LENGTH_LONG).show();
-                        Availability.add("Wednesday");
-                        break;
-                    case 3:
-                        if(isChecked)
-                            Toast.makeText(getApplicationContext(), "Clicked on 3", Toast.LENGTH_LONG).show();
-                        Availability.add("Thursday");
-                        break;
-                    case 4:
-                        if(isChecked)
-                            Toast.makeText(getApplicationContext(), "Clicked on 4", Toast.LENGTH_LONG).show();
-                        Availability.add("Friday");
-                        break;
-                    case 5:
-                        if(isChecked)
-                            Toast.makeText(getApplicationContext(), "Clicked on 5", Toast.LENGTH_LONG).show();
-                        Availability.add("Not Available");
-                        break;
-                }
+                                if(isChecked){
+                                    Availability.add(itemsDays[which]);
+                                }
+                                else{
+                                    Availability.remove(itemsDays[which]);
+                                }
+//                switch (which) {
+//                    case 0:
+//                        if(isChecked)
+//                            Toast.makeText(getApplicationContext(), "Monday", Toast.LENGTH_LONG).show();
+//                            Availability.add("Monday");
+//                        break;
+//                    case 1:
+//                        if(isChecked)
+//                            Toast.makeText(getApplicationContext(), "Tuesday", Toast.LENGTH_LONG).show();
+//                            Availability.add("Tuesday");
+//                        break;
+//                    case 2:
+//                        if(isChecked)
+//                            Toast.makeText(getApplicationContext(), "Wednesday", Toast.LENGTH_LONG).show();
+//                            Availability.add("Wednesday");
+//                        break;
+//                    case 3:
+//                        if(isChecked)
+//                            Toast.makeText(getApplicationContext(), "Thursday", Toast.LENGTH_LONG).show();
+//                            Availability.add("Thursday");
+//                        break;
+//                    case 4:
+//                        if(isChecked)
+//                            Toast.makeText(getApplicationContext(), "Friday", Toast.LENGTH_LONG).show();
+//                            Availability.add("Friday");
+//                        break;
+//                    case 5:
+//                        if(isChecked)
+//                            Toast.makeText(getApplicationContext(), "Not Available", Toast.LENGTH_LONG).show();
+//                            Availability.add("Not Available");
+//                        break;
+//                }
             }
         });
         ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -671,9 +683,34 @@ public class Profile extends AppCompatActivity {
                 Log.i("111111", editTextEmail.getText().toString());
                 Log.i("111111", editTextPassword.getText().toString());
                 if (!editTextEmail.getText().toString().matches("") || !editTextPassword.getText().toString().matches("")) {
+                    Comparator<String> dateComparator = new Comparator<String>() {
+                        @Override
+                        public int compare(String s1, String s2) {
+                            try{
+                                SimpleDateFormat format = new SimpleDateFormat("EEE");
+                                Date d1 = format.parse(s1);
+                                Date d2 = format.parse(s2);
+                                if(d1.equals(d2)){
+                                    return s1.substring(s1.indexOf(" ") + 1).compareTo(s2.substring(s2.indexOf(" ") + 1));
+                                }else{
+                                    Calendar cal1 = Calendar.getInstance();
+                                    Calendar cal2 = Calendar.getInstance();
+                                    cal1.setTime(d1);
+                                    cal2.setTime(d2);
+                                    return cal1.get(Calendar.DAY_OF_WEEK) - cal2.get(Calendar.DAY_OF_WEEK);
+                                }
+                            }catch(ParseException pe){
+                                throw new RuntimeException(pe);
+                            }
+                        }
+                    };
+                    Collections.sort(Availability, dateComparator);
+                    Set<String> set = new LinkedHashSet<>();
+                    set.addAll(Availability);
+                    Availability.clear();
+                    Availability.addAll(set);
+                    Log.d("User", "Set "+set.toString());
                     availability(editTextEmail.getText().toString(), editTextPassword.getText().toString());
-
-
                 }
                 else{
 
@@ -681,8 +718,6 @@ public class Profile extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "no Availability",
                             Toast.LENGTH_SHORT).show();
                 }
-
-
             }
         });
         ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
