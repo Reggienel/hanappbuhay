@@ -373,13 +373,46 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
         int month = cal.get(Calendar.MONTH);
         month = month + 1;
         int day = cal.get(Calendar.DAY_OF_MONTH);
-        return day + "/" + month + "/" + year;
+        return makeDateString(day,month,year);
     }
 
+    private String makeDateString(int day, int month, int year) {
+        return getMonthFormat(month) + " " + day + " " + year;
+    }
+
+    private String getMonthFormat(int month) {
+        if(month == 1)
+            return "JAN";
+        if(month == 2)
+            return "FEB";
+        if(month == 3)
+            return "MAR";
+        if(month == 4)
+            return "APR";
+        if(month == 5)
+            return "MAY";
+        if(month == 6)
+            return "JUN";
+        if(month == 7)
+            return "JUL";
+        if(month == 8)
+            return "AUG";
+        if(month == 9)
+            return "SEP";
+        if(month == 10)
+            return "OCT";
+        if(month == 11)
+            return "NOV";
+        if(month == 12)
+            return "DEC";
+
+        return "JAN";
+    }
 
     @Override
     public void onItemClickedCancel(UserAppointment userAppointment) {
-        if(userAppointment.getDate() == getTodaysDate() ){
+        Log.d("User", "userAppointment.getDate()" + userAppointment.getDate() + getTodaysDate());
+        if(!userAppointment.getDate().equals(getTodaysDate())){
             if(userAppointment.getName().startsWith("Employee")) {
                 mDatabase.child("bookings").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
