@@ -21,21 +21,54 @@
             android:layout_height="192dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="7dp"
             android:background="@null"
             android:clickable="true"
             app:srcCompat="@drawable/person" />
 
-        <RatingBar
-            android:id="@+id/ratingBarProfile"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="7dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Balance: "
+                android:textColor="#FF1493"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/balance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="#FF1493"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" PHP"
+                android:textColor="#FF1493"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <RatingBar
+            android:id="@+id/ratingBarProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="7dp"
             android:isIndicator="true"
             android:numStars="5"
-            android:stepSize="0.5"
-            android:progressTint="#FF1493"/>
+            android:progressTint="#FF1493"
+            android:stepSize="0.5" />
 
         <TextView
             android:id="@+id/full_name"

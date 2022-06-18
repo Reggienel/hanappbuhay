@@ -1,12 +1,17 @@
 package com.example.freelancerapp;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +25,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -60,10 +67,12 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseFirestore db;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private ArrayList<UserAppointment> userArrayList2;
-    private RecyclerView recyclerView;
-    String  aId, aName, aService, aTime, aDate, aPrice;
-    String userID, username; // info current user
+    public ArrayList<UserAppointment> userArrayList2;
+    public RecyclerView recyclerView;
+    recyclerAdapterDashboard adapter;
+    int recyclerItems;
+    String  aId, aName, aService, aTime, aDate, aPrice, aPhonenum;
+    String userID, userName, rating, userPhone; // info current user
     List<Double> arr = new ArrayList<>();
 //    double[] arr;
     double ratingValue;
@@ -100,7 +109,6 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
             }
         };
 
-
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         FirebaseUser fUser = mAuth.getCurrentUser();
@@ -108,32 +116,70 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
         mDatabase = mFirebaseDatabase.getReference();
         db = FirebaseFirestore.getInstance();
 
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    try {
+                        User user = new User();
+                        user.setUsername(ds.child(userID).getValue(User.class).getUsername());
+                        user.setEmail(ds.child(userID).getValue(User.class).getEmail());
+                        user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
+                        user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
+                        user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
+                        user.setServiceprice(ds.child(userID).getValue(User.class).getServiceprice());
+                        user.setLocation(ds.child(userID).getValue(User.class).getLocation());
+                        user.setRating(ds.child(userID).getValue(User.class).getRating());
+
+                        userName = user.getUsername();
+                        userPhone = user.getPhonenum();
+
+                    }
+                    catch (Exception e){
+                        Log.d("Profile", "showData: "+ e.getMessage());
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        textView = findViewById(R.id.notification);
+        mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int size = (int) snapshot.getChildrenCount();
+                textView.setText(Integer.toString(size));
+                Log.d("notif", "onDataChange: " +size);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         recyclerView = findViewById(R.id.recycleviewdb);
         userArrayList2 = new ArrayList<UserAppointment>();
         setAdapter();
-
-
     }
 
     private void setAdapter() {
-        recyclerAdapterDashboard adapter = new recyclerAdapterDashboard(userArrayList2, this);
+        adapter = new recyclerAdapterDashboard(userArrayList2, this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
        mDatabase.child("bookings").child(userID).addValueEventListener(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     try {
-//                        User user = new User();
-//                        user.setUsername(ds.child(userID).getValue(User.class).getUsername());
-//                        user.setEmail(ds.child(userID).getValue(User.class).getEmail());
-//                        user.setPhonenum(ds.child(userID).getValue(User.class).getPhonenum());
-//                        user.setServicetype(ds.child(userID).getValue(User.class).getServicetype());
-//                        user.setAvailabity(ds.child(userID).getValue(User.class).getAvailability());
-
                         UserAppointment userAppointment = new UserAppointment();
                         userAppointment = ds.getValue(UserAppointment.class);
                         aId = ds.getValue(UserAppointment.class).getId();
@@ -142,6 +188,7 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
                         aTime = ds.getValue(UserAppointment.class).getTime();
                         aDate= ds.getValue(UserAppointment.class).getDate();
                         aPrice = ds.getValue(UserAppointment.class).getServiceprice();
+                        aPhonenum = ds.getValue(UserAppointment.class).getPhonenum();
                         userArrayList2.add(userAppointment);
                         Log.d("TAG", "onDataChange: "+aName);
                     }
@@ -156,6 +203,12 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
             }
         });
     }
+     public void sendSMS(String messageToSend, String number){
+         Log.d("User", "sendSMS: " + messageToSend + number);
+        SmsManager mySmsManager = SmsManager.getDefault();
+        mySmsManager.sendTextMessage(number, null, messageToSend, null,null);
+     }
+
 
     public void ClickMenu (View view){
         //open drawer
@@ -206,15 +259,6 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
         NavDrawer.closeDrawer(drawerLayout);
     }
 
-//    public void checkOut(UserAppointment userAppointment){
-//        Intent intentCheckOut = new Intent(this, CheckoutActivityJava.class);
-//        intentCheckOut.putExtra("aId",userAppointment.getId());
-//        intentCheckOut.putExtra("serviceprice",userAppointment.getServiceprice());
-//        Log.d("TAG", "onItemClicked: "+userAppointment.getId());
-//        finish();
-//        startActivity(intentCheckOut);
-//    }
-
     @Override
     public void onItemClicked(UserAppointment userAppointment) {
         if(userAppointment.getName().startsWith("Employee")){
@@ -231,94 +275,63 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
             ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int i) {
                     ratingValue = ratingBar.getRating();
+                    try {
+                        Map<String, Object> review = new HashMap<>();
+                        review.put("reviewerName", userName);
 
-                    mDatabase.child("bookings").child(aId).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            for (DataSnapshot ds : snapshot.getChildren()) {
-                                try {
-                                    String Name;
-                                    String Service;
-                                    String Price;
+                        review.put("reviewId", userAppointment.getId());
+                        review.put("reviewName", userAppointment.getName());
+                        review.put("reviewRating", ratingValue);
 
-                                    UserAppointment userA = new UserAppointment();
-                                    userA = ds.getValue(UserAppointment.class);
-                                    Name = ds.getValue(UserAppointment.class).getName();
-                                    Service = ds.getValue(UserAppointment.class).getService();
-                                    Price = ds.getValue(UserAppointment.class).getServiceprice();
-                                    userArrayList2.add(userA);
-
-                                    Map<String, Object> review = new HashMap<>();
-                                    review.put("reviewerName", Name);
-
-                                    review.put("reviewId", userAppointment.getId());
-                                    review.put("reviewName", userAppointment.getName());
-                                    review.put("reviewRating", ratingValue);
-
-                                    // Add a new document with a generated ID
-                                    db.collection("users_review")
-                                            .add(review)
-                                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                @Override
-                                                public void onSuccess(DocumentReference documentReference) {
-                                                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                        // Add a new document with a generated ID
+                        db.collection("users_review")
+                                .add(review)
+                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                    @Override
+                                    public void onSuccess(DocumentReference documentReference) {
+                                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w(TAG, "Error adding document", e);
+                                    }
+                                });
+                        db.collection("users_review")
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @RequiresApi(api = Build.VERSION_CODES.N)
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                if (document.get("reviewId").equals(userAppointment.getId())) {
+                                                    Log.d(TAG, document.getId() + " => " + document.get("reviewRating"));
+                                                    arr.add((Double) document.get("reviewRating"));
                                                 }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.w(TAG, "Error adding document", e);
-                                                }
-                                            });
-                                    db.collection("users_review")
-                                            .get()
-                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                @RequiresApi(api = Build.VERSION_CODES.N)
-                                                @Override
-                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                    if (task.isSuccessful()) {
-                                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                                            if(document.get("reviewId").equals(userAppointment.getId())){
-                                                                Log.d(TAG, document.getId() + " => " + document.get("reviewRating"));
-                                                                arr.add((Double) document.get("reviewRating"));
-                                                            }
-                                                        }
-                                                        double totalarr = arr.stream().mapToDouble(Double::doubleValue).sum();
-                                                        double finalRate = totalarr / arr.size();
+                                            }
+                                            double totalarr = arr.stream().mapToDouble(Double::doubleValue).sum();
+                                            double finalRate = totalarr / arr.size();
 
-                                                        mDatabase.child("users").child(userAppointment.getId()).child("rating").setValue(String.valueOf(finalRate));
-                                                        mDatabase.child("users").child(userAppointment.getId()).child("userratingcount").setValue(String.valueOf(arr.size()));
+                                            mDatabase.child("users").child(userAppointment.getId()).child("rating").setValue(String.valueOf(finalRate));
+                                            mDatabase.child("users").child(userAppointment.getId()).child("userratingcount").setValue(String.valueOf(arr.size()));
 
-                                                        Intent intentCheckOut = new Intent(getApplicationContext(), CheckoutActivityJava.class);
-                                                        intentCheckOut.putExtra("aId",userAppointment.getId());
-                                                        intentCheckOut.putExtra("serviceprice",userAppointment.getServiceprice());
-                                                        startActivity(intentCheckOut);
-                                                        finish();
-                                                        Log.d("TAG", "onItemClicked: "+userAppointment.getId());
-                                                        Log.d(TAG, Arrays.toString(new List[]{arr}));
-                                                        Log.d(TAG, "Total " + finalRate);
-                                                        Log.d(TAG, "Total " + arr.size());
-                                                    }
-                                                    else {
-                                                        Log.w(TAG, "Error getting documents.", task.getException());
-                                                    }
-                                                }
-                                            });
-                                    Log.d(TAG, "onClick: "+ratingValue);
-                                }
-                                catch (NullPointerException ignored){
-                                }
-                            }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
+                                            checkOut(userAppointment.getId(), userAppointment.getServiceprice());
+                                            Log.d(TAG, Arrays.toString(new List[]{arr}));
+                                            Log.d(TAG, "Total " + finalRate);
+                                            Log.d(TAG, "Total " + arr.size());
+                                        } else {
+                                            Log.w(TAG, "Error getting documents.", task.getException());
+                                        }
+                                    }
+                                });
+                        Log.d(TAG, "onClick: " + ratingValue);
+                    } catch (NullPointerException ignored) {
 
-                        }
-                    });
-
+                    }
                 }
             });
-
             ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int i) {
 
@@ -327,7 +340,8 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
             ad1.show();// Show dialog
         }
         else{
-                if(!userAppointment.getPayment().equals("Not Paid")){
+            Log.d("User", "onItemClicked: " + userAppointment.getPayment());
+                if(!userAppointment.getPayment().equals("Not Paid") || userAppointment.getPayment().equals("Cash on Meet")){
                     AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
                     ad1.setTitle("Confirmation:");
                     ad1.setIcon(android.R.drawable.ic_dialog_info);
@@ -337,11 +351,88 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
                             mDatabase.child("bookings").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
-                                    dataSnapshot.getRef().child(userID).child(aId).removeValue();
-                                    Toast.makeText(getApplicationContext(), "Appointment Finished",
-                                            Toast.LENGTH_SHORT).show();
-                                    recreate();
+                                    LayoutInflater factory = LayoutInflater.from(Dashboard.this);
+                                    final View textEntryView = factory.inflate(R.layout.dialog_rate_user, null);
+                                    String TAG = "Firestore";
+
+                                    ratingBar = textEntryView.findViewById(R.id.dialogRatingBar);
+
+                                    AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
+                                    ad1.setTitle("Rate the User?:");
+                                    ad1.setIcon(android.R.drawable.ic_dialog_info);
+                                    ad1.setView(textEntryView);
+                                    ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int i) {
+                                            ratingValue = ratingBar.getRating();
+                                            try {
+                                                Map<String, Object> review = new HashMap<>();
+                                                review.put("reviewerName", userName);
+
+                                                review.put("reviewId", userAppointment.getId());
+                                                review.put("reviewName", userAppointment.getName());
+                                                review.put("reviewRating", ratingValue);
+
+                                                // Add a new document with a generated ID
+                                                db.collection("users_review")
+                                                        .add(review)
+                                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                            @Override
+                                                            public void onSuccess(DocumentReference documentReference) {
+                                                                Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                Log.w(TAG, "Error adding document", e);
+                                                            }
+                                                        });
+                                                db.collection("users_review")
+                                                        .get()
+                                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                            @RequiresApi(api = Build.VERSION_CODES.N)
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                        if (document.get("reviewId").equals(userAppointment.getId())) {
+                                                                            Log.d(TAG, document.getId() + " => " + document.get("reviewRating"));
+                                                                            arr.add((Double) document.get("reviewRating"));
+                                                                        }
+                                                                    }
+                                                                    double totalarr = arr.stream().mapToDouble(Double::doubleValue).sum();
+                                                                    double finalRate = totalarr / arr.size();
+
+                                                                    mDatabase.child("users").child(userAppointment.getId()).child("rating").setValue(String.valueOf(finalRate));
+                                                                    mDatabase.child("users").child(userAppointment.getId()).child("userratingcount").setValue(String.valueOf(arr.size()));
+
+                                                                    dataSnapshot.getRef().child(userID).child(userAppointment.getId()).removeValue();
+                                                                    dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
+
+                                                                    Toast.makeText(getApplicationContext(), "Appointment Finished",
+                                                                            Toast.LENGTH_SHORT).show();
+                                                                    recreate();
+                                                                    Log.d(TAG, Arrays.toString(new List[]{arr}));
+                                                                    Log.d(TAG, "Total " + finalRate);
+                                                                    Log.d(TAG, "Total " + arr.size());
+                                                                } else {
+                                                                    Log.w(TAG, "Error getting documents.", task.getException());
+                                                                }
+                                                            }
+                                                        });
+                                                Log.d(TAG, "onClick: " + ratingValue);
+                                            } catch (NullPointerException ignored) {
+
+                                            }
+                                        }
+                                    });
+                                    ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int i) {
+
+                                        }
+                                    });
+                                    ad1.show();// Show dialog
+
                                 }
 
                                 @Override
@@ -360,11 +451,34 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
                     });
                     ad1.show();// Show dialog
                 }
-              else{
-                    Toast.makeText(getApplicationContext(), "Appointment Not Paid",
-                            Toast.LENGTH_SHORT).show();
+                else{
+                        Toast.makeText(getApplicationContext(), "Appointment Not Paid",
+                                Toast.LENGTH_SHORT).show();
                 }
         }
+    }
+
+    private void checkOut(String id , String price) {
+        String[] settings_array = new String[]{"Cash on Meet", "Credit & Debit Card"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(Dashboard.this);
+        builder.setTitle("Choose Payment Method")
+                .setItems(settings_array, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(which == 0){
+                            mDatabase.child("bookings").child(userID).child(aId).child("payment").setValue("Cash on Meet");
+                            mDatabase.child("bookings").child(aId).child(userID).child("payment").setValue("Cash on Meet");
+                        }
+                        else if(which == 1){
+                            Intent intentCheckOut = new Intent(getApplicationContext(), CheckoutActivityJava.class);
+                            intentCheckOut.putExtra("aId",id);
+                            intentCheckOut.putExtra("serviceprice",price);
+                            startActivity(intentCheckOut);
+                            finish();
+
+                        }
+                    }
+                });
+                builder.show();
     }
 
     private String getTodaysDate() {
@@ -411,9 +525,8 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
 
     @Override
     public void onItemClickedCancel(UserAppointment userAppointment) {
-        Log.d("User", "userAppointment.getDate()" + userAppointment.getDate() + getTodaysDate());
+        Log.d("User", "userAppointment.getDate()" + userAppointment.getName());
         if(!userAppointment.getDate().equals(getTodaysDate())){
-            if(userAppointment.getName().startsWith("Employee")) {
                 mDatabase.child("bookings").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -425,18 +538,15 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
                             public void onClick(DialogInterface dialog, int i) {
 
                                 dataSnapshot.getRef().child(userID).child(userAppointment.getId()).removeValue();
+                                dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
+
                                 Toast.makeText(getApplicationContext(), "Appointment Cancelled",
                                         Toast.LENGTH_SHORT).show();
 
                                 Log.d("User", "userAppointment.getId()" + userAppointment.getId());
 
-                                dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
-                                Toast.makeText(getApplicationContext(), "Employee Notified",
-                                        Toast.LENGTH_SHORT).show();
 
-    //                            Intent starterIntent = new Intent(Dashboard.this, NavDrawer.class);
-    //                            finish();
-    //                            startActivity(starterIntent);
+                                sendSMS("Your appointment with " + userName + " on " + aDate+ " at " + aTime + " is Cancelled", userAppointment.getPhonenum());
                                 recreate();
                             }
                         });
@@ -455,49 +565,6 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
                         Log.d("User", databaseError.getMessage());
                     }
                 });
-            }
-            else{
-                mDatabase.child("bookings").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
-                        ad1.setTitle("Confirmation:");
-                        ad1.setIcon(android.R.drawable.ic_dialog_info);
-                        ad1.setMessage("Are you sure you want to cancel your appointment with " + aName + " on " + aDate + " at " + aTime + " ?");
-                        ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-
-                                dataSnapshot.getRef().child(userAppointment.getId()).child(userID).removeValue();
-                                Toast.makeText(getApplicationContext(), "Appointment Cancelled",
-                                        Toast.LENGTH_SHORT).show();
-
-                                dataSnapshot.getRef().child(userID).child(aId).removeValue();
-                                Toast.makeText(getApplicationContext(), "Employer Notified",
-                                        Toast.LENGTH_SHORT).show();
-
-    //                            Intent starterIntent = new Intent(Dashboard.this, NavDrawer.class);
-    //                            finish();
-    //                            startActivity(starterIntent);
-                                recreate();
-
-                            }
-                        });
-
-                        ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-
-                            }
-                        });
-                        ad1.show();// Show dialog
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d("User", databaseError.getMessage());
-                    }
-                });
-            }
         }
         else{
             Toast.makeText(getApplicationContext(),  "Cannot Cancel on Appointment Day",
@@ -512,107 +579,6 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
         startActivity(intent);
     }
 
-    public void ratingDialog(UserAppointment userAppointment){
-        LayoutInflater factory = LayoutInflater.from(Dashboard.this);
-        final View textEntryView = factory.inflate(R.layout.dialog_rate_user, null);
-        String TAG = "Firestore";
-
-        ratingBar = textEntryView.findViewById(R.id.dialogRatingBar);
-
-        AlertDialog.Builder ad1 = new AlertDialog.Builder(Dashboard.this);
-        ad1.setTitle("Rate the User?:");
-        ad1.setIcon(android.R.drawable.ic_dialog_info);
-        ad1.setView(textEntryView);
-        ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int i) {
-                ratingValue = ratingBar.getRating();
-
-                mDatabase.child("bookings").child(aId).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot ds : snapshot.getChildren()) {
-                            try {
-                                String Name;
-                                String Service;
-                                String Price;
-
-                                UserAppointment userA = new UserAppointment();
-                                userA = ds.getValue(UserAppointment.class);
-                                Name = ds.getValue(UserAppointment.class).getName();
-                                Service = ds.getValue(UserAppointment.class).getService();
-                                Price = ds.getValue(UserAppointment.class).getServiceprice();
-                                userArrayList2.add(userA);
-
-                                Map<String, Object> review = new HashMap<>();
-                                review.put("reviewerName", Name);
-
-                                review.put("reviewId", userAppointment.getId());
-                                review.put("reviewName", userAppointment.getName());
-                                review.put("reviewRating", ratingValue);
-
-                                // Add a new document with a generated ID
-                                db.collection("users_review")
-                                        .add(review)
-                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                            @Override
-                                            public void onSuccess(DocumentReference documentReference) {
-                                                Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.w(TAG, "Error adding document", e);
-                                            }
-                                        });
-                                db.collection("users_review")
-                                        .get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @RequiresApi(api = Build.VERSION_CODES.N)
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                                        if(document.get("reviewId").equals(userAppointment.getId())){
-                                                            Log.d(TAG, document.getId() + " => " + document.get("reviewRating"));
-                                                            arr.add((Double) document.get("reviewRating"));
-                                                        }
-                                                    }
-                                                    double totalarr = arr.stream().mapToDouble(Double::doubleValue).sum();
-                                                    double finalRate = totalarr / arr.size();
-
-                                                    mDatabase.child("users").child(userAppointment.getId()).child("rating").setValue(String.valueOf(finalRate));
-                                                    mDatabase.child("users").child(userAppointment.getId()).child("userratingcount").setValue(String.valueOf(arr.size()));
-                                                    Log.d(TAG, Arrays.toString(new List[]{arr}));
-                                                    Log.d(TAG, "Total " + finalRate);
-                                                }
-                                                else {
-                                                    Log.w(TAG, "Error getting documents.", task.getException());
-                                                }
-                                            }
-                                        });
-                                Log.d(TAG, "onClick: "+ratingValue);
-                            }
-                            catch (NullPointerException ignored){
-                            }
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
-            }
-        });
-
-        ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int i) {
-
-            }
-        });
-        ad1.show();// Show dialog
-    }
 
 }
 

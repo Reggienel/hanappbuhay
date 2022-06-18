@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,8 +51,8 @@ public class activity_appointment extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     FirebaseUser fUser;
     public String newUserName;
-    String selectedDate, selectedTime, meetUp, newUserID, newService, newPhoneNum, newPrice, newLocation, newImageUri;
-    String userID, username, userphonenum, userImageUri, cTime, cDate;
+    String selectedDate, selectedTime, meetUp, newUserID, newService, newPhoneNum, newPrice, newLocation, newImageUri, newRating;
+    String userID, username, userphonenum, userImageUri, cTime, cDate, userRating;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +89,7 @@ public class activity_appointment extends AppCompatActivity {
                 newPhoneNum= null;
                 newPrice = null;
                 newImageUri = null;
+                newRating = null;
             } else {
                 newUserName= extras.getString("username");
                 newUserID= extras.getString("userid");
@@ -96,6 +98,7 @@ public class activity_appointment extends AppCompatActivity {
                 newPrice= extras.getString("serviceprice");
                 newLocation = extras.getString("location");
                 newImageUri = extras.getString("profile_image_uri");
+                newRating = extras.getString("rating");
 
                 if(newImageUri != null){Glide.with(activity_appointment.this).load(newImageUri).into(imgProfile);}
 
@@ -111,6 +114,7 @@ public class activity_appointment extends AppCompatActivity {
             newPrice = (String) savedInstanceState.getSerializable("serviceprice");
             newLocation = (String) savedInstanceState.getSerializable("location");
             newImageUri = (String) savedInstanceState.getSerializable("profile_image_uri");
+            newRating = (String) savedInstanceState.getSerializable("rating");
 
             if(newImageUri != null){Glide.with(activity_appointment.this).load(newImageUri).into(imgProfile);}
 
@@ -141,16 +145,37 @@ public class activity_appointment extends AppCompatActivity {
                     user.setUsername(snapshot.getValue(User.class).getUsername());
                     user.setPhonenum(snapshot.getValue(User.class).getPhonenum());
                     user.setProfile_image_uri(snapshot.getValue(User.class).getProfile_image_uri());
+                    user.setRating(snapshot.getValue(User.class).getRating());
 
                     username = user.getUsername();
                     userphonenum = user.getPhonenum();
                     userImageUri = user.getProfile_image_uri();
-                Log.d("user", "checking: "+username);
+                    userRating = user.getRating();
+
+                Log.d("user", "checking: "+ username + userRating);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+        appointDatabase.child("bookings").child(newUserID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    UserAppointment userA = new  UserAppointment();
+                    cDate = ds.getValue(UserAppointment.class).getDate();
+                    cTime = ds.getValue(UserAppointment.class).getTime();
+                    Log.d("TAG", "onDataChange: " + cDate + cTime); }
+
+
+
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("User", error.getMessage());
             }
         });
 
@@ -160,112 +185,95 @@ public class activity_appointment extends AppCompatActivity {
                 appointDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        appointDatabase.child("bookings").child(newUserID).addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Log.d("TAG", "onDataChangetry: " + cDate + cTime);
+                        if (selectedDate != null && selectedTime != null && meetUp != null) {
+                            if (cDate == null || cTime == null) {
+                                AlertDialog.Builder ad1 = new AlertDialog.Builder(activity_appointment.this);
+                                ad1.setTitle("Confirmation:");
+                                ad1.setIcon(android.R.drawable.ic_dialog_info);
+                                ad1.setMessage("Are you sure you want to set an appointment with " + newUserName + " on " + selectedDate + " at " + selectedTime + " ?");
+                                ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int i) {
 
-                                for (DataSnapshot ds : snapshot.getChildren()) {
-                                            UserAppointment userA = new  UserAppointment();
-                                            cDate = ds.getValue(UserAppointment.class).getDate();
-                                            cTime = ds.getValue(UserAppointment.class).getTime();
-                                    Log.d("TAG", "onDataChange: " + cDate + cTime);
+                                        dataSnapshot.getRef().child(newUserID).child("id").setValue(newUserID);
+                                        dataSnapshot.getRef().child(newUserID).child("name").setValue("Employee: " + newUserName);
+                                        dataSnapshot.getRef().child(newUserID).child("service").setValue(newService);
+                                        dataSnapshot.getRef().child(newUserID).child("date").setValue(selectedDate);
+                                        dataSnapshot.getRef().child(newUserID).child("time").setValue(selectedTime);
+                                        dataSnapshot.getRef().child(newUserID).child("payment").setValue("Not Paid");
+                                        dataSnapshot.getRef().child(newUserID).child("phonenum").setValue(newPhoneNum);
+                                        dataSnapshot.getRef().child(newUserID).child("serviceprice").setValue(newPrice);
+                                        dataSnapshot.getRef().child(newUserID).child("meetup").setValue(meetUp);
+                                        dataSnapshot.getRef().child(newUserID).child("profile_image_uri").setValue(newImageUri);
+                                        dataSnapshot.getRef().child(newUserID).child("rating").setValue(newRating);
 
-                                }
+                                        sendSMS("You have an appointment with " + username + " Check Dashboard", newPhoneNum);
 
-                                    try {
-                                        Log.d("TAG", "onDataChangetry: " + cDate + cTime);
-                                        if (selectedDate != null && selectedTime != null && meetUp != null) {
-                                            if (cDate == null && cTime == null) {
-                                                AlertDialog.Builder ad1 = new AlertDialog.Builder(activity_appointment.this);
-                                                ad1.setTitle("Confirmation:");
-                                                ad1.setIcon(android.R.drawable.ic_dialog_info);
-                                                ad1.setMessage("Are you sure you want to set an appointment with " + newUserName + " on " + selectedDate + " at " + selectedTime + " ?");
-                                                ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int i) {
+                                        notifyEmployee();
+                                        Toast.makeText(getApplicationContext(), "Appointment Save",
+                                                Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(activity_appointment.this, Dashboard.class);
+                                        finish();
+                                        recreate();
+                                        startActivity(intent);
 
-                                                        dataSnapshot.getRef().child(newUserID).child("id").setValue(newUserID);
-                                                        dataSnapshot.getRef().child(newUserID).child("name").setValue("Employee: " + newUserName);
-                                                        dataSnapshot.getRef().child(newUserID).child("service").setValue(newService);
-                                                        dataSnapshot.getRef().child(newUserID).child("date").setValue(selectedDate);
-                                                        dataSnapshot.getRef().child(newUserID).child("time").setValue(selectedTime);
-                                                        dataSnapshot.getRef().child(newUserID).child("payment").setValue("Not Paid");
-                                                        dataSnapshot.getRef().child(newUserID).child("phonenum").setValue(newPhoneNum);
-                                                        dataSnapshot.getRef().child(newUserID).child("serviceprice").setValue(newPrice);
-                                                        dataSnapshot.getRef().child(newUserID).child("meetup").setValue(meetUp);
-                                                        dataSnapshot.getRef().child(newUserID).child("profile_image_uri").setValue(newImageUri);
+                                    }
+                                });
+                                ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int i) {
 
-                                                        notifyEmployee();
-                                                        Toast.makeText(getApplicationContext(), "Appointment Save",
-                                                                Toast.LENGTH_SHORT).show();
-                                                        Intent intent = new Intent(activity_appointment.this, Dashboard.class);
-                                                        finish();
-                                                        recreate();
-                                                        startActivity(intent);
+                                    }
+                                });
+                                ad1.show();// Show dialog
+                            }
+                            else {
+                                if (cDate.matches(selectedDate) && cTime.matches(selectedTime)) {
+                                    Toast.makeText(getApplicationContext(), "Date and Time Not Available",
+                                            Toast.LENGTH_SHORT).show();}
+                                else {
+                                    AlertDialog.Builder ad2 = new AlertDialog.Builder(activity_appointment.this);
+                                    ad2.setTitle("Confirmation:");
+                                    ad2.setIcon(android.R.drawable.ic_dialog_info);
+                                    ad2.setMessage("Are you sure you want to set an appointment with " + newUserName + " on " + selectedDate + " at " + selectedTime + " ?");
+                                    ad2.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int i) {
 
-                                                    }
-                                                });
-                                                ad1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int i) {
+                                            dataSnapshot.getRef().child(newUserID).child("id").setValue(newUserID);
+                                            dataSnapshot.getRef().child(newUserID).child("name").setValue("Employee: " + newUserName);
+                                            dataSnapshot.getRef().child(newUserID).child("service").setValue(newService);
+                                            dataSnapshot.getRef().child(newUserID).child("date").setValue(selectedDate);
+                                            dataSnapshot.getRef().child(newUserID).child("time").setValue(selectedTime);
+                                            dataSnapshot.getRef().child(newUserID).child("payment").setValue("Not Paid");
+                                            dataSnapshot.getRef().child(newUserID).child("phonenum").setValue(newPhoneNum);
+                                            dataSnapshot.getRef().child(newUserID).child("serviceprice").setValue(newPrice);
+                                            dataSnapshot.getRef().child(newUserID).child("meetup").setValue(meetUp);
+                                            dataSnapshot.getRef().child(newUserID).child("profile_image_uri").setValue(newImageUri);
+                                            dataSnapshot.getRef().child(newUserID).child("rating").setValue(newRating);
 
-                                                    }
-                                                });
-                                                ad1.show();// Show dialog
-                                            }
-                                            else if (cDate.matches(selectedDate) && cTime.matches(selectedTime)) {
-                                                Toast.makeText(getApplicationContext(), "Date and Time Not Available",
-                                                        Toast.LENGTH_SHORT).show(); }
-                                            else {
-                                                AlertDialog.Builder ad2 = new AlertDialog.Builder(activity_appointment.this);
-                                                ad2.setTitle("Confirmation:");
-                                                ad2.setIcon(android.R.drawable.ic_dialog_info);
-                                                ad2.setMessage("Are you sure you want to set an appointment with " + newUserName + " on " + selectedDate + " at " + selectedTime + " ?");
-                                                ad2.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int i) {
+                                            sendSMS("You have an appointment with " + username + " Check Dashboard", newPhoneNum);
 
-                                                        dataSnapshot.getRef().child(newUserID).child("id").setValue(newUserID);
-                                                        dataSnapshot.getRef().child(newUserID).child("name").setValue("Employee: " + newUserName);
-                                                        dataSnapshot.getRef().child(newUserID).child("service").setValue(newService);
-                                                        dataSnapshot.getRef().child(newUserID).child("date").setValue(selectedDate);
-                                                        dataSnapshot.getRef().child(newUserID).child("time").setValue(selectedTime);
-                                                        dataSnapshot.getRef().child(newUserID).child("payment").setValue("Not Paid");
-                                                        dataSnapshot.getRef().child(newUserID).child("phonenum").setValue(newPhoneNum);
-                                                        dataSnapshot.getRef().child(newUserID).child("serviceprice").setValue(newPrice);
-                                                        dataSnapshot.getRef().child(newUserID).child("meetup").setValue(meetUp);
-                                                        dataSnapshot.getRef().child(newUserID).child("profile_image_uri").setValue(newImageUri);
-
-                                                        notifyEmployee();
-                                                        Toast.makeText(getApplicationContext(), "Appointment Save",
-                                                                Toast.LENGTH_SHORT).show();
-                                                        Intent intent = new Intent(activity_appointment.this, Dashboard.class);
-                                                        finish();
-                                                        recreate();
-                                                        startActivity(intent);
-
-                                                    }
-                                                });
-                                                ad2.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int i) {
-
-                                                    }
-                                                });
-                                                ad2.show();// Show dialog
-                                            }
-                                        }
-                                        else{
-                                            Toast.makeText(getApplicationContext(),  "Fill the Information",
+                                            notifyEmployee();
+                                            Toast.makeText(getApplicationContext(), "Appointment Save",
                                                     Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(activity_appointment.this, Dashboard.class);
+                                            finish();
+                                            recreate();
+                                            startActivity(intent);
                                         }
-                                    }
-                                    catch (Exception e){
-                                        Log.d("User", e.getMessage());
-                                    }
+                                    });
+                                    ad2.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int i) {
 
+                                        }
+                                    });
+                                    ad2.show();}
                             }
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                Log.d("User", error.getMessage());
-                            }
-                        });
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(),  "Fill the Information",
+                                    Toast.LENGTH_SHORT).show();
+
+                        }
                     }
 
                     @Override
@@ -290,6 +298,13 @@ public class activity_appointment extends AppCompatActivity {
         });
     }
 
+    public void sendSMS(String messageToSend, String number){
+        Log.d("User", "sendSMS: " + messageToSend + number);
+        SmsManager mySmsManager = SmsManager.getDefault();
+        mySmsManager.sendTextMessage(number, null, messageToSend, null,null);
+    }
+
+
     private void notifyEmployee() {
         appointDatabase.child("bookings").child(newUserID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -304,13 +319,14 @@ public class activity_appointment extends AppCompatActivity {
                 dataSnapshot.getRef().child(userID).child("phonenum").setValue(userphonenum);
                 dataSnapshot.getRef().child(userID).child("meetup").setValue(meetUp);
                 dataSnapshot.getRef().child(userID).child("profile_image_uri").setValue(userImageUri);
+                dataSnapshot.getRef().child(userID).child("rating").setValue(userRating);
 
-                Toast.makeText(getApplicationContext(),  "Employee Notified",
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(),  "Employee Notified",
+//                        Toast.LENGTH_SHORT).show();
             }
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(),"Employee Not Notified",
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(),"Employee Not Notified",
+//                        Toast.LENGTH_SHORT).show();
                 Log.d("User", databaseError.getMessage());
             }
         });

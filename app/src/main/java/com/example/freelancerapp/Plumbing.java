@@ -75,6 +75,20 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
             }
         };
 
+        textView = findViewById(R.id.notification);
+        mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int size = (int) snapshot.getChildrenCount();
+                textView.setText(Integer.toString(size));
+                Log.d("notif", "onDataChange: " +size);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         recyclerView = findViewById(R.id.recycleview);
         userArrayList = new ArrayList<>();
         setAdapter();
@@ -176,6 +190,7 @@ public class Plumbing extends AppCompatActivity implements OnNoteListener{
         intentP.putExtra("serviceprice", user.getServiceprice());
         intentP.putExtra("location", user.getLocation());
         intentP.putExtra("profile_image_uri", user.getProfile_image_uri());
+        intentP.putExtra("rating", user.getRating());
         startActivity(intentP);
         finish();
     }

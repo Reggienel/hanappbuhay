@@ -14,14 +14,22 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 public class About extends AppCompatActivity {
     TextView textView;
     //initialize variable
     DrawerLayout drawerLayout;
+    public DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
+    private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +47,11 @@ public class About extends AppCompatActivity {
         //assign variable
         drawerLayout = findViewById(R.id.drawer_layout);
         mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabase = mFirebaseDatabase.getReference();
+        FirebaseUser user = mAuth.getCurrentUser();
+        userID = user.getUid();
+
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -53,6 +66,20 @@ public class About extends AppCompatActivity {
                 }
             }
         };
+
+        textView = findViewById(R.id.notification);
+        mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int size = (int) snapshot.getChildrenCount();
+                textView.setText(Integer.toString(size));
+                Log.d("notif", "onDataChange: " +size);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
     public void ClickMenu (View view){
         //open drawer

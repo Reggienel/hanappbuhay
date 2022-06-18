@@ -39,13 +39,14 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
         String ratingValue = userArrayList.get(position).getRating();
         String ratingCount = userArrayList.get(position).getUserratingcount();
         String price = userArrayList.get(position).getServiceprice();
-
+        String availability = userArrayList.get(position).getAvailability();
 
         if(image != null){Glide.with(holder.imgClick.getContext()).load(image).into(holder.imgClick);}
         if(location != null){holder.locationTxt.setText(location);}
         if(ratingValue != null){holder.ratingBar.setRating(Float.parseFloat(ratingValue));}
         if(ratingCount != null){holder.ratingTxt.setText(ratingCount);}
         if(price != null){holder.priceTxt.setText(price);}
+        if(availability != null){holder.availabilityTxt.setText(availability);}
 
         holder.nameTxt.setText(name);
 
@@ -64,7 +65,7 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
-        private final TextView nameTxt, locationTxt, ratingTxt, priceTxt;
+        private final TextView nameTxt, locationTxt, ratingTxt, priceTxt, availabilityTxt;
         private final ImageView imgClick;
         private final RatingBar ratingBar;
 
@@ -76,6 +77,7 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
             ratingBar = view.findViewById(R.id.ratingBarList1);
             ratingTxt = view.findViewById(R.id.rRatingCount);
             priceTxt = view.findViewById(R.id.rPrice);
+            availabilityTxt = view.findViewById(R.id.rAvailable);
         }
     }
 }

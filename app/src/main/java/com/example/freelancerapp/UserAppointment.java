@@ -11,6 +11,8 @@ public class UserAppointment {
     public String serviceprice;
     public String meetup;
     public String profile_image_uri;
+    public String availability;
+    public String rating;
 
     public UserAppointment() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -65,5 +67,13 @@ public class UserAppointment {
     public String getProfile_image_uri() { return profile_image_uri; }
 
     public void setProfile_image_uri(String profile_image_uri) { this.profile_image_uri = profile_image_uri; }
+
+    public String getAvailability() { return availability; }
+
+    public void setAvailabity(String availability) { this.availability = availability; }
+
+    public String getRating() { return rating; }
+
+    public void setRating(String rating) { this.rating = rating; }
 }
 

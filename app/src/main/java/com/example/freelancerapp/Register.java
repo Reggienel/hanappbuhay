@@ -7,11 +7,14 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.MessageDigest;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -42,6 +45,7 @@ public class Register extends AppCompatActivity {
     StorageReference storageReference;
 
     EditText etFname, etEmail, etphonenum, etPassword, etConfPassword;
+    TextView haveAccountTxt;
     CheckBox checkBox;
     String fname, email, cnumber, password, confpassword;
     public Uri imageURI;
@@ -107,6 +111,26 @@ public class Register extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 chooseProfilePic();
+            }
+        });
+
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder ad1 = new AlertDialog.Builder(Register.this);
+                ad1.setTitle("Terms and Conditions");
+                ad1.setIcon(android.R.drawable.ic_dialog_info);
+                ad1.setMessage(getResources().getString(R.string.paragraph));
+                ad1.setPositiveButton("Ok", null);
+                ad1.show();// Show dialog
+            }
+        });
+
+        haveAccountTxt = findViewById(R.id.txtHaveAccount);
+        haveAccountTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LogIn();
             }
         });
     }

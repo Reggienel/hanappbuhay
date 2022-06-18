@@ -112,7 +112,8 @@
             android:clickable="true"
             android:text="I accept the Terms and Conditions"
             android:textColor="#339933"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:focusable="true" />
 
         <Button
             android:id="@+id/reg_butt"
@@ -134,7 +135,7 @@
             android:textSize="15sp"
             android:textStyle="bold" />
         <TextView
-            android:id="@+id/login_textview"
+            android:id="@+id/txtHaveAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

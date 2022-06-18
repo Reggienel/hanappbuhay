@@ -20,7 +20,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -66,7 +65,7 @@ public class Profile extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     StorageReference storageReference;
     ImageView imgProfilePic;
-    TextView sName, sEmail, sPhoneNumber,sService, sAvailability, sServicePrice, sLocation;
+    TextView sName, sEmail, sPhoneNumber,sService, sAvailability, sServicePrice, sLocation, sBalance, textView;
     EditText editTextNewName,editTextNewEmail, editTextNewPassword, editTextEmail, editTextPassword,editTextServicePrice, editTextLocation;
     String userID;
     String name;
@@ -112,7 +111,7 @@ public class Profile extends AppCompatActivity {
         sServicePrice = findViewById(R.id.tvServicePrice);
         sLocation = findViewById(R.id.txtvLocation);
         ratingBar = findViewById(R.id.ratingBarProfile);
-
+        sBalance = findViewById(R.id.balance);
 
         imgProfilePic = findViewById(R.id.imgProfilePic);
 
@@ -145,10 +144,13 @@ public class Profile extends AppCompatActivity {
                         user.setServiceprice(ds.child(userID).getValue(User.class).getServiceprice());
                         user.setLocation(ds.child(userID).getValue(User.class).getLocation());
                         user.setRating(ds.child(userID).getValue(User.class).getRating());
+                        user.setBalance(ds.child(userID).getValue(User.class).getBalance());
 
                         sEmail.setText(user.getEmail());
                         sPhoneNumber.setText(user.getPhonenum());
                         sName.setText(user.getUsername());
+                        if(user.getBalance() != null){
+                            sBalance.setText(user.getBalance().toString());}
                         if(user.getRating() != null){
                             ratingBar.setRating(Float.parseFloat(user.getRating()));}
                         if (user.getServicetype() != null) {
@@ -163,20 +165,6 @@ public class Profile extends AppCompatActivity {
                     catch (Exception e){
                         Log.d("Profile", "showData: "+ e.getMessage());
                     }
-
-
-//            StorageReference filepath = storageReference.child("profile_picture_"+userID);
-//            filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                @Override
-//                public void onSuccess(Uri uri) {
-//                    Picasso.get().load(uri).into(imgProfilePic);
-//                }
-//            }).addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception exception) {
-//                    Log.d("View Profile", "No Upload Profile");
-//                }
-//            });
                 }
 
             }
@@ -186,6 +174,7 @@ public class Profile extends AppCompatActivity {
 
             }
         });
+
         imgProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -212,6 +201,20 @@ public class Profile extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
+        textView = findViewById(R.id.notification);
+        mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int size = (int) snapshot.getChildrenCount();
+                textView.setText(Integer.toString(size));
+                Log.d("notif", "onDataChange: " +size);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
@@ -497,7 +500,7 @@ public class Profile extends AppCompatActivity {
                         //hideProgressBar();
                         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                         updateRealData(5);
-                        Toast.makeText(getApplicationContext(), "Set Service Price",
+                        Toast.makeText(getApplicationContext(), "Service Price Set",
                                 Toast.LENGTH_SHORT).show();
                     }
                     else {
@@ -594,7 +597,6 @@ public class Profile extends AppCompatActivity {
         editTextPassword = (EditText)textEntryView.findViewById(R.id.editTextPassword);
         AlertDialog.Builder ad1 = new AlertDialog.Builder(Profile.this);
         ad1.setTitle("Set Location:");
-        ad1.setIcon(android.R.drawable.ic_dialog_info);
         ad1.setView(textEntryView);
         ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int i) {
@@ -624,15 +626,14 @@ public class Profile extends AppCompatActivity {
         LayoutInflater factory = LayoutInflater.from(Profile.this);
         final View textEntryView = factory.inflate(R.layout.dialog_availability, null);
 
-        itemsDays = new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday","N/A"};
-        boolean[] checkedItems = {false, false, false, false, false,false};
+        itemsDays = new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", " N/A"};
+        boolean[] checkedItems = {false, false, false, false, false,false,false,false};
 
         editTextEmail = (EditText)textEntryView.findViewById(R.id.editTextEmail);
         editTextPassword = (EditText)textEntryView.findViewById(R.id.editTextPassword);
         Availability.clear();
         AlertDialog.Builder ad1 = new AlertDialog.Builder(Profile.this);
         ad1.setTitle("Availability:");
-        ad1.setIcon(android.R.drawable.ic_dialog_info);
         ad1.setView(textEntryView);
         ad1.setMultiChoiceItems(itemsDays, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
@@ -747,21 +748,30 @@ public class Profile extends AppCompatActivity {
         editTextPassword = (EditText)textEntryView.findViewById(R.id.editTextPassword);
         AlertDialog.Builder ad1 = new AlertDialog.Builder(Profile.this);
         ad1.setTitle("Service Type:");
-        ad1.setIcon(android.R.drawable.ic_dialog_info);
         ad1.setView(textEntryView);
         ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int i) {
 
                 Log.i("111111", editTextEmail.getText().toString());
                 Log.i("111111", editTextPassword.getText().toString());
-                if (!editTextServicePrice.getText().toString().matches("") || !editTextEmail.getText().toString().matches("") || !editTextPassword.getText().toString().matches("")) {
-                        servicetype(editTextEmail.getText().toString(), editTextPassword.getText().toString());
-                        serviceprice(editTextEmail.getText().toString(), editTextPassword.getText().toString());
+                if (!editTextEmail.getText().toString().matches("") || !editTextPassword.getText().toString().matches("")) {
+                        if(editTextServicePrice.getText().toString().matches("") && dropdown.getSelectedItem().toString().matches("Employer")){
+                            servicetype(editTextEmail.getText().toString(), editTextPassword.getText().toString());
+                            serviceprice(editTextEmail.getText().toString(), editTextPassword.getText().toString());
+                        }
+                        else if (!editTextServicePrice.getText().toString().matches("")){
+                            servicetype(editTextEmail.getText().toString(), editTextPassword.getText().toString());
+                            serviceprice(editTextEmail.getText().toString(), editTextPassword.getText().toString());
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(), "No Price",
+                                    Toast.LENGTH_SHORT).show();
+                        }
                 }
                 else{
 
                     //showProgressBar();
-                    Toast.makeText(getApplicationContext(), "no Service Type",
+                    Toast.makeText(getApplicationContext(), "No Service Type",
                             Toast.LENGTH_SHORT).show();
                 }
             }
@@ -784,7 +794,6 @@ public class Profile extends AppCompatActivity {
         editTextPassword = (EditText)textEntryView.findViewById(R.id.editTextPassword);
         AlertDialog.Builder ad1 = new AlertDialog.Builder(Profile.this);
         ad1.setTitle("Change Name:");
-        ad1.setIcon(android.R.drawable.ic_dialog_info);
         ad1.setView(textEntryView);
         ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int i) {
@@ -820,7 +829,6 @@ public class Profile extends AppCompatActivity {
 
         AlertDialog.Builder ad1 = new AlertDialog.Builder(Profile.this);
         ad1.setTitle("Change Email:");
-        ad1.setIcon(android.R.drawable.ic_dialog_info);
         ad1.setView(textEntryView);
         ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int i) {
@@ -855,7 +863,6 @@ public class Profile extends AppCompatActivity {
 
         AlertDialog.Builder ad1 = new AlertDialog.Builder(Profile.this);
         ad1.setTitle("Change Password:");
-        ad1.setIcon(android.R.drawable.ic_dialog_info);
         ad1.setView(textEntryView);
         ad1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int i) {

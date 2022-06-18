@@ -66,6 +66,7 @@ public class CheckoutActivityJava extends AppCompatActivity {
 
     private static String aId, serprice;
     private static String userID;
+    private static Double  ecoins;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,6 +118,38 @@ public class CheckoutActivityJava extends AppCompatActivity {
         fUser = mAuth.getCurrentUser();
         userID = fUser.getUid();
         mDatabase = mFirebaseDatabase.getReference();
+
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    try {
+                        User user = new User();
+                        user.setUsername(ds.child(aId).getValue(User.class).getUsername());
+                        user.setEmail(ds.child(aId).getValue(User.class).getEmail());
+                        user.setBalance(ds.child(aId).getValue(User.class).getBalance());
+                        Log.d("checkout", "showData: Email" + user.getEmail());
+
+                        if(user.getBalance() != null){
+                            ecoins = user.getBalance();
+                        }
+                        else{
+                            ecoins = 0.0;
+                        }
+
+                    }
+                    catch (Exception e){
+                        Log.d("checkout", "showData: "+ e.getMessage());
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         startCheckout();
     }
@@ -171,9 +204,10 @@ public class CheckoutActivityJava extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), title,
                             Toast.LENGTH_SHORT).show();
 
-                        Intent intentDash = new Intent(CheckoutActivityJava.this, Dashboard.class);
-                        startActivity(intentDash);
+                        Intent intentDash = new Intent(CheckoutActivityJava.this, NavDrawer.class);
                         finish();
+                        startActivity(intentDash);
+
                 }
                 else{
                         Toast.makeText(getApplicationContext(), title,
@@ -257,6 +291,10 @@ public class CheckoutActivityJava extends AppCompatActivity {
                 );
                 mDatabase.child("bookings").child(userID).child(aId).child("payment").setValue(serprice);
                 mDatabase.child("bookings").child(aId).child(userID).child("payment").setValue(serprice);
+                mDatabase.child("users").child(aId).child("balance").setValue(ecoins + Double.parseDouble(serprice.replace("PHP","")));
+                Log.d("checkout", "showData: ecoins " + ecoins);
+                Log.d("checkout", "showData: serprice" + serprice.replace("PHP",""));
+                Log.d("checkout", "showData: double " + ecoins + Double.parseDouble(serprice.replace("PHP","")));
 
                 Log.d("payment", "Dialog Alert SuccessPaymentResultCallback");
             } else if (status == PaymentIntent.Status.RequiresPaymentMethod) {

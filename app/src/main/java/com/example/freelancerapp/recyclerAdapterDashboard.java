@@ -1,10 +1,12 @@
 package com.example.freelancerapp;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,11 +18,11 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapterDashboard.MyViewHolder> {
-    private ArrayList<UserAppointment> userArrayList = new ArrayList<>();
+    private ArrayList<UserAppointment> userArrayList2 = new ArrayList<>();
     private final OnNoteListenerdashboard listenerdb;
 
-    public recyclerAdapterDashboard(ArrayList<UserAppointment> userArrayList, OnNoteListenerdashboard listenerdb){
-        this.userArrayList = userArrayList;
+    public recyclerAdapterDashboard(ArrayList<UserAppointment> userArrayList2, OnNoteListenerdashboard listenerdb){
+        this.userArrayList2 = userArrayList2;
         this.listenerdb = listenerdb;
     }
 
@@ -33,16 +35,18 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
 
     @Override
     public void onBindViewHolder(@NonNull recyclerAdapterDashboard.MyViewHolder holder, int position) {
-        String name = userArrayList.get(position).getName();
-        String service = userArrayList.get(position).getService();
-        String time = userArrayList.get(position).getTime();
-        String date = userArrayList.get(position).getDate();
-        String payment = userArrayList.get(position).getPayment();
-        String meetup = userArrayList.get(position).getMeetup();
-        String image = userArrayList.get(position).getProfile_image_uri();
+        String name = userArrayList2.get(position).getName();
+        String service = userArrayList2.get(position).getService();
+        String time = userArrayList2.get(position).getTime();
+        String date = userArrayList2.get(position).getDate();
+        String payment = userArrayList2.get(position).getPayment();
+        String meetup = userArrayList2.get(position).getMeetup();
+        String image = userArrayList2.get(position).getProfile_image_uri();
+        String ratingValue = userArrayList2.get(position).getRating();
 
 
         if(image != null){Glide.with(holder.imgClick.getContext()).load(image).into(holder.imgClick);}
+        if(ratingValue != null){holder.ratingBar.setRating(Float.parseFloat(ratingValue));}
 
         holder.nameTxt.setText(name);
         holder.serviceTxt.setText(service);
@@ -51,42 +55,45 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
         holder.paymentTxt.setText(payment);
         holder.meetTxt.setText(meetup);
 
+
         holder.markAsDoneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(name.startsWith("Employee")){
-                    if(payment.equals("Not Paid")){listenerdb.onItemClicked(userArrayList.get(holder.getAdapterPosition()));}
-                    else{ Toast.makeText(view.getContext(), "Already Paid",
+                    if(payment.equals("Not Paid")){listenerdb.onItemClicked(userArrayList2.get(holder.getAdapterPosition()));}
+                    else{
+                        Toast.makeText(view.getContext(), "Already Paid",
                                 Toast.LENGTH_SHORT).show();}
                 }
                 else{
-                    listenerdb.onItemClicked(userArrayList.get(holder.getAdapterPosition()));
+                    listenerdb.onItemClicked(userArrayList2.get(holder.getAdapterPosition()));
                 }
             }
         });
         holder.cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listenerdb.onItemClickedCancel(userArrayList.get(holder.getAdapterPosition()));
+                listenerdb.onItemClickedCancel(userArrayList2.get(holder.getAdapterPosition()));
             }
         });
         holder.msgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listenerdb.onItemClickedMessage(userArrayList.get(holder.getAdapterPosition()));
+                listenerdb.onItemClickedMessage(userArrayList2.get(holder.getAdapterPosition()));
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return userArrayList.size();
+        return userArrayList2.size();
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
         private final TextView nameTxt, serviceTxt,timeTxt,dateTxt,paymentTxt,meetTxt;
         private final Button markAsDoneBtn, cancelBtn, msgBtn;
         private final ImageView imgClick;
+        private final RatingBar ratingBar;
 
         public MyViewHolder(final View view, OnNoteListenerdashboard listener){
             super(view);
@@ -100,6 +107,7 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
             cancelBtn = view.findViewById(R.id.btnCancelAppointment);
             msgBtn = view.findViewById(R.id.btnMsg);
             imgClick = view.findViewById(R.id.imageViewDashboard);
+            ratingBar = view.findViewById(R.id.ratingBarList2);
         }
     }
 }

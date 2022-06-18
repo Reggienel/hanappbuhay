@@ -1,7 +1,5 @@
 package com.example.freelancerapp;
 
-import java.net.URI;
-
 public class User {
     public String userid;
     public String username;
@@ -16,6 +14,7 @@ public class User {
     public String date_posted;
     public String rating;
     public String userratingcount;
+    public Double  balance;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -100,5 +99,10 @@ public class User {
     public String getUserratingcount() { return  userratingcount; }
 
     public void setUserratingcount(String userratingcount) { this. userratingcount =  userratingcount; }
+
+    public Double getBalance(){ return balance;}
+
+    public void setBalance(Double  balance) { this.balance = balance; }
+
 }
 

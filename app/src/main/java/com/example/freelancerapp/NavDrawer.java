@@ -2,13 +2,20 @@ package com.example.freelancerapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +26,14 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 
 
 public class NavDrawer extends AppCompatActivity {
@@ -26,8 +41,12 @@ public class NavDrawer extends AppCompatActivity {
     ImageView ivCleaning, ivLaundry, ivPlumbing, ivElectrical;
     //Initialize Variable
     DrawerLayout drawerLayout;
-    private FirebaseAuth.AuthStateListener mAuthListener;
+    public DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
+    private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseFirestore db;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    String userID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,11 +56,10 @@ public class NavDrawer extends AppCompatActivity {
         //assign variable
         drawerLayout = findViewById(R.id.drawer_layout);
         mAuth = FirebaseAuth.getInstance();
-
-        ivCleaning = findViewById(R.id.cleaning);
-        ivLaundry= findViewById(R.id.laundry);
-        ivPlumbing = findViewById(R.id.plumbing);
-        ivElectrical = findViewById(R.id.electrical);
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        FirebaseUser fUser = mAuth.getCurrentUser();
+        userID = fUser.getUid();
+        mDatabase = mFirebaseDatabase.getReference();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -57,6 +75,27 @@ public class NavDrawer extends AppCompatActivity {
                 }
             }
         };
+
+        textView = findViewById(R.id.notification);
+        mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    int size = (int) snapshot.getChildrenCount();
+                    textView.setText(Integer.toString(size));
+                    Log.d("notif", "onDataChange: " +size);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        ivCleaning = findViewById(R.id.cleaning);
+        ivLaundry= findViewById(R.id.laundry);
+        ivPlumbing = findViewById(R.id.plumbing);
+        ivElectrical = findViewById(R.id.electrical);
+
+        ActivityCompat.requestPermissions(NavDrawer.this, new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS,Manifest.permission.READ_PHONE_STATE}, PackageManager.PERMISSION_GRANTED);
 
         ivCleaning.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +144,6 @@ public class NavDrawer extends AppCompatActivity {
     }
 
     public void ClickMenu(View view){
-        //open drawer
         openDrawer(drawerLayout);
     }
 

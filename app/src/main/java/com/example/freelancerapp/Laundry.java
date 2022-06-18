@@ -73,6 +73,21 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
                 }
             }
         };
+
+        textView = findViewById(R.id.notification);
+        mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int size = (int) snapshot.getChildrenCount();
+                textView.setText(Integer.toString(size));
+                Log.d("notif", "onDataChange: " +size);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         recyclerView = findViewById(R.id.recycleview);
         userArrayList = new ArrayList<>();
         setAdapter();
@@ -174,6 +189,7 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
         intentL.putExtra("serviceprice", user.getServiceprice());
         intentL.putExtra("location", user.getLocation());
         intentL.putExtra("profile_image_uri", user.getProfile_image_uri());
+        intentL.putExtra("rating", user.getRating());
         startActivity(intentL);
         finish();
     }
