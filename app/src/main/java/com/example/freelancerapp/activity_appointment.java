@@ -206,6 +206,7 @@ public class activity_appointment extends AppCompatActivity {
                                         dataSnapshot.getRef().child(newUserID).child("meetup").setValue(meetUp);
                                         dataSnapshot.getRef().child(newUserID).child("profile_image_uri").setValue(newImageUri);
                                         dataSnapshot.getRef().child(newUserID).child("rating").setValue(newRating);
+                                        dataSnapshot.getRef().child(newUserID).child("confirmation").setValue("unconfirmed");
 
                                         sendSMS("You have an appointment with " + username + " Check Dashboard", newPhoneNum);
 
@@ -249,6 +250,7 @@ public class activity_appointment extends AppCompatActivity {
                                             dataSnapshot.getRef().child(newUserID).child("meetup").setValue(meetUp);
                                             dataSnapshot.getRef().child(newUserID).child("profile_image_uri").setValue(newImageUri);
                                             dataSnapshot.getRef().child(newUserID).child("rating").setValue(newRating);
+                                            dataSnapshot.getRef().child(newUserID).child("confirmation").setValue("unconfirmed");
 
                                             sendSMS("You have an appointment with " + username + " Check Dashboard", newPhoneNum);
 
@@ -320,6 +322,7 @@ public class activity_appointment extends AppCompatActivity {
                 dataSnapshot.getRef().child(userID).child("meetup").setValue(meetUp);
                 dataSnapshot.getRef().child(userID).child("profile_image_uri").setValue(userImageUri);
                 dataSnapshot.getRef().child(userID).child("rating").setValue(userRating);
+                dataSnapshot.getRef().child(userID).child("confirmation").setValue("unconfirmed");
 
 //                Toast.makeText(getApplicationContext(),  "Employee Notified",
 //                        Toast.LENGTH_SHORT).show();

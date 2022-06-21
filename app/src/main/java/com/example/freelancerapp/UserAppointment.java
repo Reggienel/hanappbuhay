@@ -13,6 +13,7 @@ public class UserAppointment {
     public String profile_image_uri;
     public String availability;
     public String rating;
+    public String confirmation;
 
     public UserAppointment() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -75,5 +76,9 @@ public class UserAppointment {
     public String getRating() { return rating; }
 
     public void setRating(String rating) { this.rating = rating; }
+
+    public String getConfirmation() { return confirmation; }
+
+    public void setConfirmation(String confirmation) { this.confirmation = confirmation; }
 }
 

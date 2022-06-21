@@ -6,4 +6,8 @@ public interface OnNoteListenerdashboard {
     void onItemClickedCancel(UserAppointment userAppointment);
 
     void onItemClickedMessage(UserAppointment userAppointment);
+
+    void onItemClickedConfirm(UserAppointment userAppointment);
+
+
 }

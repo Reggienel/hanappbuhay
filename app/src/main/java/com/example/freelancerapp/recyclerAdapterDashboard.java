@@ -43,11 +43,11 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
         String meetup = userArrayList2.get(position).getMeetup();
         String image = userArrayList2.get(position).getProfile_image_uri();
         String ratingValue = userArrayList2.get(position).getRating();
+        String confirmation = userArrayList2.get(position).getConfirmation();
 
 
         if(image != null){Glide.with(holder.imgClick.getContext()).load(image).into(holder.imgClick);}
         if(ratingValue != null){holder.ratingBar.setRating(Float.parseFloat(ratingValue));}
-
         holder.nameTxt.setText(name);
         holder.serviceTxt.setText(service);
         holder.dateTxt.setText(date);
@@ -55,33 +55,65 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
         holder.paymentTxt.setText(payment);
         holder.meetTxt.setText(meetup);
 
+        if(confirmation.matches("confirmed")) {
+                holder.markAsDoneBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (name.startsWith("Employee")) {
+                            if (payment.equals("Not Paid")) {
+                                listenerdb.onItemClicked(userArrayList2.get(holder.getAdapterPosition()));
+                            } else {
+                                Toast.makeText(view.getContext(), "Already Paid",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            listenerdb.onItemClicked(userArrayList2.get(holder.getAdapterPosition()));
+                        }
+                    }
+                });
+                holder.cancelBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        listenerdb.onItemClickedCancel(userArrayList2.get(holder.getAdapterPosition()));
+                    }
+                });
+                holder.msgBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        listenerdb.onItemClickedMessage(userArrayList2.get(holder.getAdapterPosition()));
+                    }
+                });
+        }
+        else if (!name.startsWith("Employee")) {
+            holder.markAsDoneBtn.setText("Confirm");
+            holder.cancelBtn.setText("Decline");
+            holder.markAsDoneBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listenerdb.onItemClickedConfirm(userArrayList2.get(holder.getAdapterPosition()));
+                }
+            });
+            holder.cancelBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listenerdb.onItemClickedCancel(userArrayList2.get(holder.getAdapterPosition()));
+                }
+            });
+            holder.msgBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listenerdb.onItemClickedMessage(userArrayList2.get(holder.getAdapterPosition()));
+                }
+            });
+        }
+        else{
+            holder.msgBtn.setVisibility(View.GONE);
+            holder.markAsDoneBtn.setVisibility(View.GONE);
+            holder.cancelBtn.setVisibility(View.GONE);
+            holder.statusTxt.setVisibility(View.VISIBLE);
+            holder.statusTxt.setText("Waiting for Confirmation");
+        }
 
-        holder.markAsDoneBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(name.startsWith("Employee")){
-                    if(payment.equals("Not Paid")){listenerdb.onItemClicked(userArrayList2.get(holder.getAdapterPosition()));}
-                    else{
-                        Toast.makeText(view.getContext(), "Already Paid",
-                                Toast.LENGTH_SHORT).show();}
-                }
-                else{
-                    listenerdb.onItemClicked(userArrayList2.get(holder.getAdapterPosition()));
-                }
-            }
-        });
-        holder.cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listenerdb.onItemClickedCancel(userArrayList2.get(holder.getAdapterPosition()));
-            }
-        });
-        holder.msgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listenerdb.onItemClickedMessage(userArrayList2.get(holder.getAdapterPosition()));
-            }
-        });
     }
 
     @Override
@@ -90,7 +122,7 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
-        private final TextView nameTxt, serviceTxt,timeTxt,dateTxt,paymentTxt,meetTxt;
+        private final TextView nameTxt, serviceTxt,timeTxt,dateTxt,paymentTxt,meetTxt,statusTxt;
         private final Button markAsDoneBtn, cancelBtn, msgBtn;
         private final ImageView imgClick;
         private final RatingBar ratingBar;
@@ -108,6 +140,7 @@ public class recyclerAdapterDashboard extends RecyclerView.Adapter<recyclerAdapt
             msgBtn = view.findViewById(R.id.btnMsg);
             imgClick = view.findViewById(R.id.imageViewDashboard);
             ratingBar = view.findViewById(R.id.ratingBarList2);
+            statusTxt = view.findViewById(R.id.status);
         }
     }
 }

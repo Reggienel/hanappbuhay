@@ -579,6 +579,12 @@ public class Dashboard extends AppCompatActivity implements OnNoteListenerdashbo
         startActivity(intent);
     }
 
+    @Override
+    public void onItemClickedConfirm(UserAppointment userAppointment) {
+        mDatabase.child("bookings").child(userID).child(userAppointment.getId()).child("confirmation").setValue("confirmed");
+        mDatabase.child("bookings").child(userAppointment.getId()).child(userID).child("confirmation").setValue("confirmed");
+        recreate();
+    }
 
 }
 
