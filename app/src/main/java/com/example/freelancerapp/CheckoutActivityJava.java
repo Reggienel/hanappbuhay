@@ -286,8 +286,8 @@ public class CheckoutActivityJava extends AppCompatActivity {
                 // Payment completed successfully
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 activity.displayAlert(
-                        "Payment completed",
-                        gson.toJson(paymentIntent)
+                        "Payment completed","Payment Successful"
+//                        gson.toJson(paymentIntent)
                 );
                 mDatabase.child("bookings").child(userID).child(aId).child("payment").setValue(serprice);
                 mDatabase.child("bookings").child(aId).child(userID).child("payment").setValue(serprice);
@@ -300,8 +300,8 @@ public class CheckoutActivityJava extends AppCompatActivity {
             } else if (status == PaymentIntent.Status.RequiresPaymentMethod) {
                 // Payment failed – allow retrying using a different payment method
                 activity.displayAlert(
-                        "Payment failed",
-                        Objects.requireNonNull(paymentIntent.getLastPaymentError()).getMessage()
+                        "Payment failed","Payment Failed"
+//                        Objects.requireNonNull(paymentIntent.getLastPaymentError()).getMessage()
                 );
                 Log.d("payment", "Dialog Alert FailedPaymentResultCallback");
             }

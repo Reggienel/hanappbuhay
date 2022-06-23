@@ -31,7 +31,7 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
     TextView textView;
     //initialize variable
     DrawerLayout drawerLayout;
-    public DatabaseReference mDatabase;
+    public DatabaseReference mDatabase, dbNotif;
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -56,6 +56,7 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabase = mFirebaseDatabase.getReference("users");
+        dbNotif = mFirebaseDatabase.getReference();
         FirebaseUser fUser = mAuth.getCurrentUser();
         userID = fUser.getUid();
 
@@ -75,7 +76,7 @@ public class Laundry extends AppCompatActivity implements OnNoteListener{
         };
 
         textView = findViewById(R.id.notification);
-        mDatabase.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+        dbNotif.child("bookings").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 int size = (int) snapshot.getChildrenCount();
