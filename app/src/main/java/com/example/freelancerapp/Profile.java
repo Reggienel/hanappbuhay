@@ -888,7 +888,7 @@ public class Profile extends AppCompatActivity {
     }
 
     public AlertDialog Settings(){
-        String[] settings_array = new String[]{"Change Name", "Change Email", "Change Password","Service Type", "Availability","Set Location"};
+        String[] settings_array = new String[]{"Change Name", "Change Email", "Change Password","Service Type", "Availability","Set Location", "Payout"};
         AlertDialog.Builder builder = new AlertDialog.Builder(Profile.this);
         builder.setTitle("Account Settings")
                 .setItems(settings_array, new DialogInterface.OnClickListener() {
@@ -910,6 +910,11 @@ public class Profile extends AppCompatActivity {
                         }
                         else if (which == 5){
                             dialogLocation();
+                        }
+                        else if (which == 6){
+                            Intent intent = new Intent(getApplicationContext(), Payout.class);
+                            startActivity(intent);
+                            finish();
                         }
                     }
                 });
