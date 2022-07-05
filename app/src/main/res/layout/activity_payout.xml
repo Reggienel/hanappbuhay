@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff5f6"
+    android:gravity="center"
+    tools:context=".Payout">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="20dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="15dp"
+
+            android:text="Money Transfer"
+            android:textColor="#339933"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/amountTxt"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edit"
+            android:drawablePadding="10dp"
+            android:hint="Amount"
+            android:inputType="number"
+            android:padding="20dp"
+            android:textColorHint="#339933" />
+
+        <EditText
+            android:id="@+id/accountNumber"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edit"
+            android:drawablePadding="10dp"
+            android:hint="Account Number"
+            android:inputType="number"
+            android:padding="20dp"
+            android:textColorHint="#339933" />
+
+        <EditText
+            android:id="@+id/fname"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint= "Full Name"
+            android:textColorHint="#339933"
+            android:layout_gravity="center"
+            android:drawablePadding="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edit"
+            android:padding="20dp"
+            />
+
+        <Button
+            android:id="@+id/send_butt"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/button"
+            android:text="Send"
+            android:textColor="#fff" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
